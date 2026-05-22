@@ -1,0 +1,218 @@
+/* Tiphia highlight plugin. Keep selectors scoped because admin and themes style pre/code globally. */
+.tiphia-code-block {
+  --code-bg: #ffffff;
+  --code-panel: #f6f8fa;
+  --code-text: #24292f;
+  --code-muted: #57606a;
+  --code-border: #d0d7de;
+  --token-keyword: #cf222e;
+  --token-string: #0a3069;
+  --token-comment: #6e7781;
+  --token-number: #0550ae;
+  --token-function: #8250df;
+  overflow: hidden !important;
+  border: 1px solid var(--code-border) !important;
+  border-radius: 12px !important;
+  background: var(--code-bg) !important;
+  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.08) !important;
+  margin: 22px 0 !important;
+}
+
+.tiphia-code-block.style-one_light {
+  --code-bg: #fafafa;
+  --code-panel: #f0f2f5;
+  --code-text: #383a42;
+  --code-muted: #696c77;
+  --code-border: #d8dce6;
+  --token-keyword: #a626a4;
+  --token-string: #50a14f;
+  --token-comment: #7f848e;
+  --token-number: #986801;
+  --token-function: #4078f2;
+}
+
+.tiphia-code-block.style-dracula {
+  --code-bg: #282a36;
+  --code-panel: #1f212b;
+  --code-text: #f8f8f2;
+  --code-muted: #bdc3d6;
+  --code-border: #3b3f51;
+  --token-keyword: #ff79c6;
+  --token-string: #f1fa8c;
+  --token-comment: #8a93bd;
+  --token-number: #bd93f9;
+  --token-function: #50fa7b;
+}
+
+.tiphia-code-block.style-solarized_dark {
+  --code-bg: #002b36;
+  --code-panel: #073642;
+  --code-text: #eee8d5;
+  --code-muted: #93a1a1;
+  --code-border: #174955;
+  --token-keyword: #b58900;
+  --token-string: #2aa198;
+  --token-comment: #839496;
+  --token-number: #d33682;
+  --token-function: #268bd2;
+}
+
+.tiphia-code-block .tiphia-code-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  min-height: 38px !important;
+  border-bottom: 1px solid var(--code-border) !important;
+  background: var(--code-panel) !important;
+  padding: 0 13px !important;
+}
+
+.tiphia-code-block .tiphia-window-dots {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  gap: 7px !important;
+}
+
+.tiphia-code-block .tiphia-window-dots i {
+  display: block !important;
+  width: 11px !important;
+  height: 11px !important;
+  border-radius: 999px !important;
+  background: #ff5f57 !important;
+}
+
+.tiphia-code-block .tiphia-window-dots i:nth-child(2) { background: #ffbd2e !important; }
+.tiphia-code-block .tiphia-window-dots i:nth-child(3) { background: #28c840 !important; }
+
+.tiphia-code-block .tiphia-code-language {
+  color: var(--code-muted) !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+  letter-spacing: .04em !important;
+  text-transform: uppercase !important;
+}
+
+.tiphia-code-block > pre,
+.tiphia-code-block pre.tiphia-code-pre,
+.content .tiphia-code-block > pre,
+.content .tiphia-code-block pre.tiphia-code-pre {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: var(--code-bg) !important;
+  color: var(--code-text) !important;
+  padding: 18px 20px !important;
+  overflow: auto !important;
+  white-space: pre !important;
+  box-shadow: none !important;
+}
+
+.tiphia-code-block > pre > code,
+.tiphia-code-block pre.tiphia-code-pre > code,
+.content .tiphia-code-block > pre > code,
+.content .tiphia-code-block pre.tiphia-code-pre > code {
+  display: block !important;
+  width: max-content !important;
+  min-width: 100% !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: inherit !important;
+  padding: 0 !important;
+  font-size: 13.5px !important;
+  line-height: 1.72 !important;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  white-space: inherit !important;
+}
+
+.tiphia-code-block.wrap > pre,
+.tiphia-code-block.wrap > pre > code,
+.content .tiphia-code-block.wrap > pre,
+.content .tiphia-code-block.wrap > pre > code {
+  width: 100% !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+}
+
+.tiphia-code-block .token,
+.content .tiphia-code-block .token {
+  display: inline !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  white-space: inherit !important;
+}
+
+.tiphia-code-block .token.keyword { color: var(--token-keyword) !important; font-weight: 700 !important; }
+.tiphia-code-block .token.string { color: var(--token-string) !important; }
+.tiphia-code-block .token.comment { color: var(--token-comment) !important; font-style: italic !important; }
+.tiphia-code-block .token.number { color: var(--token-number) !important; }
+.tiphia-code-block .token.function { color: var(--token-function) !important; }
+
+.highlight-config-panel {
+  display: grid !important;
+  gap: 18px !important;
+  max-width: 100% !important;
+}
+
+.highlight-config-panel .highlight-style-field {
+  display: grid !important;
+  gap: 8px !important;
+}
+
+.highlight-config-panel .highlight-style-field > span,
+.highlight-config-panel .highlight-style-field > small {
+  display: block !important;
+}
+
+.highlight-config-panel .highlight-options {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+  gap: 10px !important;
+  margin: 8px 0 18px !important;
+}
+
+.highlight-config-panel .highlight-options label {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 9px !important;
+  min-width: 0 !important;
+  min-height: 42px !important;
+  border: 1px solid #d8e1ef !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  padding: 0 12px !important;
+  color: #334155 !important;
+  line-height: 1.35 !important;
+  text-align: left !important;
+}
+
+.highlight-config-panel .highlight-options input[type="checkbox"] {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+.highlight-config-panel .highlight-options span {
+  display: block !important;
+  min-width: 0 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  overflow-wrap: anywhere !important;
+}
+
+.highlight-config-panel .tiphia-code-preview {
+  margin-top: 8px !important;
+  margin-bottom: 20px !important;
+}
+
+.highlight-config-panel .tiphia-code-preview code {
+  width: 100% !important;
+}
