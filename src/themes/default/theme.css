@@ -1,0 +1,120 @@
+:root[data-theme="default"] {
+  --theme-page-bg: #f8fafc;
+  --theme-surface: #f8fafc;
+  --theme-text: #111827;
+  --theme-muted: #64748b;
+  --theme-border: #dbe3ef;
+}
+
+:root[data-theme="default"] body {
+  background: var(--theme-page-bg);
+  color: var(--theme-text);
+}
+
+:root[data-theme="default"] .site {
+  background: var(--theme-page-bg);
+}
+
+:root[data-theme="default"] button,
+:root[data-theme="default"] .button {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+}
+
+:root[data-theme="default"] button:hover,
+:root[data-theme="default"] .button:hover {
+  filter: brightness(0.92);
+}
+
+:root[data-theme="default"] button.text-button,
+:root[data-theme="default"] .button.subtle {
+  border-color: var(--theme-border);
+  background: var(--theme-surface);
+  color: var(--accent);
+}
+
+:root[data-theme="default"] .site-header,
+:root[data-theme="default"] footer,
+:root[data-theme="default"] .post-card,
+:root[data-theme="default"] .widget,
+:root[data-theme="default"] .comment,
+:root[data-theme="default"] .friend-link {
+  border-color: var(--theme-border);
+  background: var(--theme-surface);
+}
+
+:root[data-theme="default"] a:hover,
+:root[data-theme="default"] .site-title,
+:root[data-theme="default"] .post-card h2 a:hover {
+  color: var(--accent);
+}
+
+:root[data-theme="default"] .muted,
+:root[data-theme="default"] .post-meta,
+:root[data-theme="default"] footer {
+  color: var(--theme-muted);
+}
+
+.external-warning-page {
+  display: grid;
+  place-items: center;
+  min-height: min(620px, calc(100vh - 180px));
+  padding: 34px 0;
+}
+
+.external-warning-panel {
+  display: grid;
+  gap: 16px;
+  width: min(620px, 100%);
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  background: var(--theme-surface);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.1);
+  padding: 26px;
+}
+
+.external-warning-panel > strong {
+  color: var(--accent);
+  font-size: 13px;
+}
+
+.external-warning-panel h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.external-warning-panel p {
+  margin: 0;
+  color: var(--theme-muted);
+  line-height: 1.7;
+}
+
+.external-target {
+  display: grid;
+  gap: 7px;
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 14px;
+}
+
+.external-target span {
+  color: var(--theme-muted);
+  font-size: 12px;
+}
+
+.external-target code {
+  overflow-wrap: anywhere;
+  border-radius: 6px;
+  background: #eef2f7;
+  padding: 8px;
+}
+
+.external-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
