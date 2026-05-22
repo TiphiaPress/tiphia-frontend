@@ -3,6 +3,7 @@ import {
   Boxes,
   FileText,
   LayoutDashboard,
+  Github,
   LogOut,
   MessageSquare,
   Palette,
@@ -16,6 +17,8 @@ import { adminPath } from "../lib/routes";
 import { FrontendHookSlot } from "../../framework/plugin-hooks";
 import { useI18n } from "../../framework/i18n";
 import { Brand } from "./Brand";
+
+const PROJECT_REPOSITORY_URL = "https://github.com/TiphiaPress/tiphia";
 
 const links = [
   { to: adminPath(), label: "总览", icon: LayoutDashboard },
@@ -79,7 +82,13 @@ export function Shell() {
             <LogOut size={18} />
           </button>
         </header>
-        <Outlet />
+        <div className="main-content"><Outlet /></div>
+        <footer className="admin-footer">
+          <a href={PROJECT_REPOSITORY_URL} target="_blank" rel="noreferrer">
+            <Github size={16} />
+            GitHub: TiphiaPress/tiphia
+          </a>
+        </footer>
       </main>
     </div>
   );

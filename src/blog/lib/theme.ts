@@ -46,3 +46,4 @@ export function themeNavPages(config?: Record<string, unknown>): ThemeNavPage[] 
   });
   return pages;
 }
+

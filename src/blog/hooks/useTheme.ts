@@ -10,17 +10,13 @@ export function useTheme(theme?: { active: string; config: Record<string, unknow
     root.dataset.theme = theme?.active || "default";
     applyThemeVariables(root, config);
     applyCustomCss(typeof config.custom_css === "string" ? config.custom_css : "");
-    applyFavicon(readOptionalString(config.favicon_url) || readOptionalString(config.favicon) || "/favicon.ico");
+    applyFavicon(themeFavicon(theme?.active));
     if (fontFamily) {
       root.style.setProperty("--theme-font", fontFamily);
     } else {
       root.style.removeProperty("--theme-font");
     }
   }, [theme]);
-}
-
-function readOptionalString(value: unknown) {
-  return typeof value === "string" && value.trim() ? value.trim() : "";
 }
 
 function applyThemeVariables(root: HTMLElement, config: Record<string, unknown>) {
@@ -54,6 +50,11 @@ function applyCustomCss(css: string) {
     document.head.appendChild(element);
   }
   element.textContent = css;
+}
+
+function themeFavicon(themeName?: string) {
+  const name = themeName || "default";
+  return `/themes/${encodeURIComponent(name)}/favicon.ico`;
 }
 
 function applyFavicon(href: string) {

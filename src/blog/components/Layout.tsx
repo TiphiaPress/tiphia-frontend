@@ -40,6 +40,7 @@ export function Layout() {
         registrationEnabled={settings.data?.registration_enabled}
         navPages={navPages}
         terms={terms.data?.data || []}
+        config={themeConfig}
       />
     </FrontendPluginProvider>
   );
