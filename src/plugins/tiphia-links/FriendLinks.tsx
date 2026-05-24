@@ -1,14 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { requestPublic } from "../../framework/public-api";
-import { normalizedAssetUrl, normalizedHttpUrl } from "../../blog/lib/url";
-
-interface FriendLink {
-  name: string;
-  description?: string | null;
-  url: string;
-  avatar_url?: string | null;
-  category?: string | null;
-}
+import { FriendLinkCard } from "./FriendLinkCard";
+import { groupFriendLinks, visibleFriendLinks } from "./friendLinkUtils";
+import type { FriendLink } from "./types";
 
 export function LinksPageContent() {
   const links = useQuery({
@@ -25,8 +19,7 @@ export function LinksPageContent() {
 }
 
 function FriendLinks({ links }: { links: FriendLink[] }) {
-  const visibleLinks = links.filter((link) => normalizedHttpUrl(link.url));
-  const groups = groupFriendLinks(visibleLinks);
+  const groups = groupFriendLinks(visibleFriendLinks(links));
   if (groups.length === 0) {
     return null;
   }
@@ -46,35 +39,4 @@ function FriendLinks({ links }: { links: FriendLink[] }) {
       ))}
     </section>
   );
-}
-
-function FriendLinkCard({ link }: { link: FriendLink }) {
-  const avatarUrl = normalizedAssetUrl(link.avatar_url);
-
-  return (
-    <a
-      className="friend-link"
-      href={normalizedHttpUrl(link.url) || "#"}
-      target="_blank"
-      rel="noreferrer noopener"
-    >
-      {avatarUrl ? <img src={avatarUrl} alt="" loading="lazy" referrerPolicy="no-referrer" /> : null}
-      <span>
-        <strong>{link.name}</strong>
-        {link.description ? <small>{link.description}</small> : null}
-      </span>
-    </a>
-  );
-}
-
-function groupFriendLinks(links: FriendLink[]) {
-  const groups = new Map<string, FriendLink[]>();
-  links.forEach((link) => {
-    const category = link.category?.trim() || "未分类";
-    groups.set(category, [...(groups.get(category) || []), link]);
-  });
-  return Array.from(groups.entries()).map(([category, items]) => ({
-    category,
-    links: items,
-  }));
 }

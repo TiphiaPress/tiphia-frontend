@@ -4,6 +4,7 @@ import { LinksConfigPanel } from "./LinksConfigPanel";
 
 registerFrontendPlugin({
   name: "tiphia-links",
+  backendNames: ["tiphia-plugin-links"],
   adminConfigPanel: LinksConfigPanel,
   hooks: [
     {

@@ -47,3 +47,22 @@ export function themeNavPages(config?: Record<string, unknown>): ThemeNavPage[] 
   return pages;
 }
 
+
+export function themeStringArray(config: Record<string, unknown> | undefined, key: string) {
+  const raw = config?.[key];
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+  return raw.flatMap((item) => (typeof item === "string" && item.trim() ? [item.trim()] : []));
+}
+
+export function themeNumberArray(config: Record<string, unknown> | undefined, key: string) {
+  const raw = config?.[key];
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+  return raw.flatMap((item) => {
+    const parsed = typeof item === "number" ? item : typeof item === "string" ? Number(item) : NaN;
+    return Number.isInteger(parsed) && parsed > 0 ? [parsed] : [];
+  });
+}

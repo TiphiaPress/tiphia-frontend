@@ -44,6 +44,7 @@ export interface SiteSettings {
   title: string;
   description: string;
   avatar_url?: string | null;
+  gravatar_base_url?: string | null;
   base_url?: string | null;
   timezone: string;
   default_page_size: number;
@@ -68,6 +69,7 @@ export interface CommentNode {
   post_id: number;
   parent_id?: number | null;
   author_name: string;
+  author_email: string;
   author_url?: string | null;
   content: string;
   status: "pending" | "approved" | "spam" | "trash";

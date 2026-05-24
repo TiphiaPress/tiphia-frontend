@@ -7,7 +7,7 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { TermArchive, TermDirectory } from "./pages/Terms";
 import { Timeline } from "./pages/Timeline";
 import { CustomPageDetail, PageDetail, PostDetail } from "./pages/PostPages";
-import { ExternalWarningPage } from "../themes/default/ExternalWarningPage";
+import { ExternalWarningPage } from "./pages/ExternalWarningPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,6 +34,7 @@ export function App() {
             <Route path="posts/:slug" element={<PostDetail />} />
             <Route path="pages/:slug" element={<PageDetail />} />
             <Route path="custom-pages/:slug" element={<CustomPageDetail />} />
+            <Route path="links" element={<CustomPageDetail fixedSlug="links" />} />
             <Route path="terms/:id" element={<TermArchive />} />
           </Route>
         </Routes>

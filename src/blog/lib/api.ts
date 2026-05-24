@@ -53,6 +53,12 @@ export const api = {
   },
   pages: () => request<Page<PostResponse>>("/api/v1/pages?page=1&per_page=20"),
   popularPosts: (limit = 5) => request<PostResponse[]>(`/api/v1/posts/popular?limit=${limit}`),
+  pinnedPosts: async (ids: number[] = [], slugs: string[] = []) => {
+    const byId = await Promise.all(ids.map((id) => request<PostResponse>(`/api/v1/posts/${id}`).catch(() => null)));
+    const bySlug = await Promise.all(slugs.map((slug) => request<PostResponse>(`/api/v1/posts/slug/${encodeURIComponent(slug)}`).catch(() => null)));
+    const posts = [...byId, ...bySlug].filter((post): post is PostResponse => Boolean(post));
+    return Array.from(new Map(posts.map((post) => [post.id, post])).values());
+  },
   terms: () => request<Page<TermResponse>>("/api/v1/terms?page=1&per_page=100"),
   postBySlug: (slug: string) => request<PostResponse>(`/api/v1/posts/slug/${slug}`),
   pageBySlug: (slug: string) => request<PostResponse>(`/api/v1/pages/slug/${slug}`),

@@ -67,6 +67,7 @@ export interface HeadContribution {
 
 export interface FrontendPlugin {
   name: string;
+  backendNames?: string[];
   adminConfigPanel?: PluginConfigPanel;
   hooks?: HookContribution[];
   head?: HeadContribution[];
@@ -111,7 +112,7 @@ export function FrontendPluginProvider({
 export function FrontendHookSlot({ hook, context = {} }: { hook: FrontendHook; context?: HookContext }) {
   const enabledPlugins = useContext(EnabledPluginsContext);
   const contributions = Array.from(plugins.values())
-    .filter((plugin) => isPluginEnabled(plugin.name, enabledPlugins))
+    .filter((plugin) => isPluginEnabled(plugin, enabledPlugins))
     .flatMap((plugin) =>
       (plugin.hooks || [])
         .filter((item) => item.hook === hook)
@@ -136,7 +137,7 @@ export function useFrontendHeadEffects(context: HookContext = {}) {
   const enabledPlugins = useContext(EnabledPluginsContext);
   useEffect(() => {
     const cleanups = Array.from(plugins.values())
-      .filter((plugin) => isPluginEnabled(plugin.name, enabledPlugins))
+      .filter((plugin) => isPluginEnabled(plugin, enabledPlugins))
       .flatMap((plugin) =>
         (plugin.head || []).map((item) => ({
           ...item,
@@ -153,8 +154,8 @@ export function useFrontendHeadEffects(context: HookContext = {}) {
   }, [enabledPluginsKey(enabledPlugins), JSON.stringify(context)]);
 }
 
-function isPluginEnabled(name: string, enabledPlugins: Set<string> | null) {
-  return !enabledPlugins || enabledPlugins.size === 0 || enabledPlugins.has(name);
+function isPluginEnabled(plugin: FrontendPlugin, enabledPlugins: Set<string> | null) {
+  return !enabledPlugins || enabledPlugins.size === 0 || [plugin.name, ...(plugin.backendNames || [])].some((name) => enabledPlugins.has(name));
 }
 
 function enabledPluginsKey(enabledPlugins: Set<string> | null) {

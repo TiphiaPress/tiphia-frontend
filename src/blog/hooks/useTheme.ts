@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { themeFor } from "../../themes";
 
 export function useTheme(theme?: { active: string; config: Record<string, unknown> }) {
   useEffect(() => {
@@ -8,9 +9,10 @@ export function useTheme(theme?: { active: string; config: Record<string, unknow
     const fontFamily = typeof config.font_family === "string" ? config.font_family : "";
     root.style.setProperty("--accent", accent);
     root.dataset.theme = theme?.active || "default";
+    root.classList.toggle("theme-liquid-glass", config.liquid_glass === true);
     applyThemeVariables(root, config);
     applyCustomCss(typeof config.custom_css === "string" ? config.custom_css : "");
-    applyFavicon(themeFavicon(theme?.active));
+    applyFavicon(themeFor(theme?.active).faviconUrl);
     if (fontFamily) {
       root.style.setProperty("--theme-font", fontFamily);
     } else {
@@ -52,12 +54,10 @@ function applyCustomCss(css: string) {
   element.textContent = css;
 }
 
-function themeFavicon(themeName?: string) {
-  const name = themeName || "default";
-  return `/themes/${encodeURIComponent(name)}/favicon.ico`;
-}
-
-function applyFavicon(href: string) {
+function applyFavicon(href?: string) {
+  if (!href) {
+    return;
+  }
   let element = document.head.querySelector<HTMLLinkElement>('link[rel="icon"]');
   if (!element) {
     element = document.createElement("link");
@@ -66,3 +66,4 @@ function applyFavicon(href: string) {
   }
   element.href = href;
 }
+

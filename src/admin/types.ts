@@ -140,6 +140,7 @@ export interface SiteSettings {
   title: string;
   description: string;
   avatar_url?: string | null;
+  gravatar_base_url?: string | null;
   base_url?: string | null;
   timezone: string;
   default_page_size: number;

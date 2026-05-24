@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { I18nProvider } from "../framework/i18n";
 import { RequireAuth } from "./components/RequireAuth";
+import { RedirectToAllowedAdminPage, RequirePermission } from "./components/RequirePermission";
 import { Shell } from "./components/Shell";
 import { ToastProvider } from "./components/Toast";
 import { Comments } from "./pages/Comments";
@@ -30,29 +31,29 @@ export function App() {
       <I18nProvider>
         <ToastProvider>
           <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route element={<RequireAuth />}>
-              <Route element={<Shell />}>
-                <Route index element={<Dashboard />} />
-                <Route path="/posts" element={<ContentList type="post" />} />
-                <Route path="/posts/new" element={<ContentEditor type="post" />} />
-                <Route path="/posts/:id/edit" element={<ContentEditor type="post" />} />
-                <Route path="/pages" element={<ContentList type="page" />} />
-                <Route path="/pages/new" element={<ContentEditor type="page" />} />
-                <Route path="/pages/:id/edit" element={<ContentEditor type="page" />} />
-                <Route path="/comments" element={<Comments />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/users" element={<Users />} />
-                <Route path="/settings" element={<SettingsPage />} />
-                <Route path="/plugins" element={<Plugins />} />
-                <Route path="/plugins/:name/config" element={<PluginConfig />} />
-                <Route path="/themes" element={<Themes />} />
-                <Route path="/themes/:name/config" element={<ThemeConfig />} />
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route element={<RequireAuth />}>
+                <Route element={<Shell />}>
+                  <Route index element={<RequirePermission section="dashboard"><Dashboard /></RequirePermission>} />
+                  <Route path="/posts" element={<RequirePermission section="posts"><ContentList type="post" /></RequirePermission>} />
+                  <Route path="/posts/new" element={<RequirePermission section="posts"><ContentEditor type="post" /></RequirePermission>} />
+                  <Route path="/posts/:id/edit" element={<RequirePermission section="posts"><ContentEditor type="post" /></RequirePermission>} />
+                  <Route path="/pages" element={<RequirePermission section="pages"><ContentList type="page" /></RequirePermission>} />
+                  <Route path="/pages/new" element={<RequirePermission section="pages"><ContentEditor type="page" /></RequirePermission>} />
+                  <Route path="/pages/:id/edit" element={<RequirePermission section="pages"><ContentEditor type="page" /></RequirePermission>} />
+                  <Route path="/comments" element={<RequirePermission section="comments"><Comments /></RequirePermission>} />
+                  <Route path="/terms" element={<RequirePermission section="terms"><Terms /></RequirePermission>} />
+                  <Route path="/users" element={<RequirePermission section="users"><Users /></RequirePermission>} />
+                  <Route path="/settings" element={<RequirePermission section="settings"><SettingsPage /></RequirePermission>} />
+                  <Route path="/plugins" element={<RequirePermission section="plugins"><Plugins /></RequirePermission>} />
+                  <Route path="/plugins/:name/config" element={<RequirePermission section="plugins"><PluginConfig /></RequirePermission>} />
+                  <Route path="/themes" element={<RequirePermission section="themes"><Themes /></RequirePermission>} />
+                  <Route path="/themes/:name/config" element={<RequirePermission section="themes"><ThemeConfig /></RequirePermission>} />
+                </Route>
               </Route>
-            </Route>
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+              <Route path="*" element={<RedirectToAllowedAdminPage />} />
+            </Routes>
           </BrowserRouter>
         </ToastProvider>
       </I18nProvider>

@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { getStoredUser, getToken } from "../lib/auth";
+import { visibleAdminSections } from "../lib/permissions";
 import { adminPath } from "../lib/routes";
 
 export function RequireAuth() {
@@ -7,7 +8,7 @@ export function RequireAuth() {
     return <Navigate to={adminPath("/login")} replace />;
   }
   const user = getStoredUser();
-  if (!user || !["root", "admin", "editor"].includes(user.role)) {
+  if (!user || visibleAdminSections(user).length === 0) {
     return <Navigate to={adminPath("/login")} replace />;
   }
 

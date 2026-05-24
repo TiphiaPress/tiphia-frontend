@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Eye, History, Save, Trash2 } from "lucide-react";
+import { Save, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ConfirmBox } from "../components/ConfirmBox";
@@ -8,16 +8,10 @@ import { useToast } from "../components/Toast";
 import { useI18n } from "../../framework/i18n";
 import { api } from "../lib/api";
 import { adminPath } from "../lib/routes";
-import type { PostStatus, PostType, TermType } from "../types";
-
-const emptyPost = {
-  slug: "",
-  title: "",
-  markdown: "",
-  excerpt: "",
-  status: "draft" as PostStatus,
-  published_at: "",
-};
+import { EditorMainPanel } from "../features/content-editor/EditorMainPanel";
+import { EditorSidePanel } from "../features/content-editor/EditorSidePanel";
+import { emptyPost } from "../features/content-editor/editorModel";
+import type { PostType, TermType } from "../types";
 
 export function ContentEditor({ type }: { type: PostType }) {
   const { id } = useParams();
@@ -156,178 +150,31 @@ export function ContentEditor({ type }: { type: PostType }) {
           save.mutate();
         }}
       >
-        <section className="panel editor-main">
-          <label className="field">
-            <span>{t("content.title")}</span>
-            <input
-              value={form.title}
-              onChange={(event) => {
-                const title = event.target.value;
-                setForm({
-                  ...form,
-                  title,
-                });
-              }}
-            />
-          </label>
-          <label className="field">
-            <span>Slug</span>
-            <input
-              placeholder="my-first-post"
-              pattern="[a-z0-9-]+"
-              value={form.slug}
-              onChange={(event) => {
-                setForm({ ...form, slug: slugify(event.target.value) });
-              }}
-            />
-            <small>{t("editor.slug_help")}</small>
-          </label>
-          <label className="field">
-            <span>{t("editor.markdown")}</span>
-            <textarea
-              className="markdown-editor"
-              value={form.markdown}
-              onChange={(event) => setForm({ ...form, markdown: event.target.value })}
-            />
-          </label>
-          <details className="preview-panel">
-            <summary>
-              <Eye size={16} />
-              {t("editor.preview")}
-            </summary>
-            <article>
-              <h1>{form.title || t("editor.untitled")}</h1>
-              <p>{form.excerpt}</p>
-              <pre>{form.markdown}</pre>
-            </article>
-          </details>
-        </section>
+        <EditorMainPanel form={form} onChange={setForm} t={t} />
 
-        <aside className="panel editor-side">
-          <label className="field">
-            <span>{t("content.status")}</span>
-            <select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value as PostStatus })}>
-              <option value="draft">{t("status.draft")}</option>
-              <option value="pending_review">{t("status.pending_review")}</option>
-              <option value="published">{t("status.published")}</option>
-              <option value="scheduled">{t("status.scheduled")}</option>
-              <option value="archived">{t("status.archived")}</option>
-            </select>
-          </label>
-          <label className="field">
-            <span>{t("editor.publish_time")}</span>
-            <input
-              placeholder="2026-06-01T00:00:00Z"
-              value={form.published_at}
-              onChange={(event) => setForm({ ...form, published_at: event.target.value })}
-            />
-          </label>
-          <label className="field">
-            <span>{t("editor.excerpt")}</span>
-            <textarea rows={5} value={form.excerpt} onChange={(event) => setForm({ ...form, excerpt: event.target.value })} />
-          </label>
-          <div className="field">
-            <span>{t("terms.title")}</span>
-            <div className="segmented compact">
-              <button
-                className={termType === "category" ? "" : "subtle"}
-                type="button"
-                onClick={() => setTermType("category")}
-              >
-                {t("terms.category")}
-              </button>
-              <button
-                className={termType === "tag" ? "" : "subtle"}
-                type="button"
-                onClick={() => setTermType("tag")}
-              >
-                {t("terms.tag")}
-              </button>
-            </div>
-            <div className="check-list">
-              {allTerms.data?.data.length ? (
-                allTerms.data.data.map((term) => (
-                  <label key={term.id} className="check-row">
-                    <input
-                      type="checkbox"
-                      checked={selectedTermIds.includes(term.id)}
-                      onChange={(event) => {
-                        setSelectedTermIds((current) =>
-                          event.target.checked
-                            ? [...current, term.id]
-                            : current.filter((id) => id !== term.id),
-                        );
-                      }}
-                    />
-                    <span>{term.name}</span>
-                  </label>
-                ))
-              ) : (
-                <small>{t("editor.no_terms", undefined, { type: termType === "category" ? t("terms.category") : t("terms.tag") })}</small>
-              )}
-            </div>
-          </div>
-          {save.error || remove.error ? <p className="error-text">{(save.error || remove.error)?.message}</p> : null}
-          <button type="submit" disabled={save.isPending} onClick={() => setSaveAction("stay")}>
-            <Save size={16} />
-            {t("action.save")}
-          </button>
-          <button
-            className="subtle"
-            type="submit"
-            disabled={save.isPending}
-            onClick={() => setSaveAction("return")}
-          >
-            {t("editor.save_return")}
-          </button>
-          {!isNew ? (
-            <button className="danger" type="button" onClick={() => remove.mutate()} disabled={remove.isPending}>
-              <Trash2 size={16} />
-              {t("action.delete")}
-            </button>
-          ) : null}
-          {!isNew ? (
-            <section className="revision-panel">
-              <h3>
-                <History size={16} />
-                {t("editor.revisions")}
-              </h3>
-              {revisions.isLoading ? <small>{t("state.loading")}</small> : null}
-              {revisions.data?.length ? (
-                <div className="revision-list">
-                  {revisions.data.slice(0, 6).map((revision) => (
-                    <div className="revision-row" key={revision.id}>
-                      <button
-                        className="subtle"
-                        type="button"
-                        onClick={() => setPreviewRevisionId((current) => (current === revision.id ? null : revision.id))}
-                      >
-                        {t("editor.revision_view", undefined, { time: new Date(revision.created_at).toLocaleString() })}
-                      </button>
-                      <button
-                        className="subtle"
-                        type="button"
-                        disabled={restore.isPending}
-                        onClick={() => setRestoreTarget({ id: revision.id, createdAt: revision.created_at })}
-                      >
-                        {t("action.restore")}
-                      </button>
-                      {previewRevisionId === revision.id ? (
-                        <article className="revision-preview">
-                          <strong>{revision.title}</strong>
-                          <small>{revision.status}</small>
-                          <pre>{revision.markdown}</pre>
-                        </article>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <small>{t("editor.no_revisions")}</small>
-              )}
-            </section>
-          ) : null}
-        </aside>
+        <EditorSidePanel
+          form={form}
+          terms={allTerms.data?.data || []}
+          selectedTermIds={selectedTermIds}
+          termType={termType}
+          isNew={isNew}
+          savePending={save.isPending}
+          deletePending={remove.isPending}
+          restorePending={restore.isPending}
+          saveError={save.error}
+          deleteError={remove.error}
+          revisions={revisions.data}
+          revisionsLoading={revisions.isLoading}
+          previewRevisionId={previewRevisionId}
+          onFormChange={setForm}
+          onTermTypeChange={setTermType}
+          onSelectedTermIdsChange={setSelectedTermIds}
+          onSaveActionChange={setSaveAction}
+          onDelete={() => remove.mutate()}
+          onPreviewRevision={setPreviewRevisionId}
+          onRestoreRevision={setRestoreTarget}
+          t={t}
+        />
       </form>
       <ConfirmBox
         open={Boolean(restoreTarget)}
@@ -351,11 +198,7 @@ export function ContentEditor({ type }: { type: PostType }) {
   );
 }
 
-function slugify(value: string) {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 120);
-}
+
+
+
+

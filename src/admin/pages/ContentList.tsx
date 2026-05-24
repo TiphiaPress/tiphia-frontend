@@ -1,27 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Archive, Edit3, Plus, Search, Send, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ConfirmBox } from "../components/ConfirmBox";
 import { Empty, ErrorState, Loading } from "../components/Status";
 import { useToast } from "../components/Toast";
+import { ContentBulkBar } from "../features/content-list/ContentBulkBar";
+import { ContentPagination } from "../features/content-list/ContentPagination";
+import { ContentTable } from "../features/content-list/ContentTable";
+import { ContentToolbar } from "../features/content-list/ContentToolbar";
+import type { PostStatusFilter } from "../features/content-list/contentListModel";
 import { api } from "../lib/api";
 import { adminPath } from "../lib/routes";
-import type { BulkPostAction, PostStatus, PostType, TermType } from "../types";
-import { useState } from "react";
+import type { BulkPostAction, PostType, TermType } from "../types";
 import { useI18n } from "../../framework/i18n";
-
-const statuses: Array<{ labelKey: string; value: PostStatus | "" }> = [
-  { labelKey: "content.all", value: "" },
-  { labelKey: "status.published", value: "published" },
-  { labelKey: "status.draft", value: "draft" },
-  { labelKey: "status.pending_review", value: "pending_review" },
-  { labelKey: "status.scheduled", value: "scheduled" },
-  { labelKey: "status.archived", value: "archived" },
-];
 
 export function ContentList({ type }: { type: PostType }) {
   const [q, setQ] = useState("");
-  const [status, setStatus] = useState<PostStatus | "">("");
+  const [status, setStatus] = useState<PostStatusFilter>("");
   const [page, setPage] = useState(1);
   const [termType, setTermType] = useState<TermType>("category");
   const [termId, setTermId] = useState("");
@@ -82,150 +78,54 @@ export function ContentList({ type }: { type: PostType }) {
           <h1>{title}</h1>
           <p>{t("content.manage", undefined, { title })}</p>
         </div>
-        <Link className="button" to={`${basePath}/new`}>
+        <Link className="button" to={basePath + "/new"}>
           <Plus size={16} />
           {t("content.new", undefined, { title })}
         </Link>
       </div>
 
-      <div className="toolbar">
-        <label className="search-box">
-          <Search size={16} />
-          <input
-            placeholder={t("content.search", undefined, { title })}
-            value={q}
-            onChange={(event) => {
-              setQ(event.target.value);
-              setPage(1);
-            }}
-          />
-        </label>
-        <select
-          value={status}
-          onChange={(event) => {
-            setStatus(event.target.value as PostStatus | "");
-            setPage(1);
-          }}
-        >
-          {statuses.map((item) => (
-            <option key={item.value || "all"} value={item.value}>
-              {t(item.labelKey)}
-            </option>
-          ))}
-        </select>
-        <select
-          value={termType}
-          onChange={(event) => {
-            setTermType(event.target.value as TermType);
-            setTermId("");
-            setPage(1);
-          }}
-        >
-          <option value="category">{t("content.category")}</option>
-          <option value="tag">{t("content.tag")}</option>
-        </select>
-        <select
-          value={termId}
-          onChange={(event) => {
-            setTermId(event.target.value);
-            setPage(1);
-          }}
-        >
-          <option value="">{termType === "category" ? t("content.all_category") : t("content.all_tag")}</option>
-          {terms.data?.data.map((term) => (
-            <option key={term.id} value={term.id}>
-              {term.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      <ContentToolbar
+        q={q}
+        status={status}
+        termType={termType}
+        termId={termId}
+        terms={terms.data?.data || []}
+        title={title}
+        onQueryChange={(value) => {
+          setQ(value);
+          setPage(1);
+        }}
+        onStatusChange={(value) => {
+          setStatus(value);
+          setPage(1);
+        }}
+        onTermTypeChange={(value) => {
+          setTermType(value);
+          setTermId("");
+          setPage(1);
+        }}
+        onTermIdChange={(value) => {
+          setTermId(value);
+          setPage(1);
+        }}
+        t={t}
+      />
 
-      {selectedIds.length > 0 ? (
-        <div className="bulk-bar">
-          <span>{t("content.selected", undefined, { count: selectedIds.length, title })}</span>
-          <button className="subtle" disabled={bulk.isPending} onClick={() => runBulk("publish")}>
-            <Send size={16} />
-            {t("content.bulk_publish")}
-          </button>
-          <button className="subtle" disabled={bulk.isPending} onClick={() => runBulk("archive")}>
-            <Archive size={16} />
-            {t("content.bulk_archive")}
-          </button>
-          <button className="danger" disabled={bulk.isPending} onClick={() => runBulk("delete")}>
-            <Trash2 size={16} />
-            {t("content.bulk_delete")}
-          </button>
-        </div>
-      ) : null}
+      <ContentBulkBar count={selectedIds.length} title={title} pending={bulk.isPending} onRun={runBulk} t={t} />
 
       {query.isLoading ? <Loading /> : null}
       {query.error ? <ErrorState error={query.error} /> : null}
       {query.data && query.data.data.length === 0 ? <Empty /> : null}
       {query.data && query.data.data.length > 0 ? (
         <>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>
-                  <input
-                    type="checkbox"
-                    checked={query.data.data.every((post) => selectedIds.includes(post.id))}
-                    onChange={(event) => {
-                      setSelectedIds(event.target.checked ? query.data.data.map((post) => post.id) : []);
-                    }}
-                  />
-                </th>
-                <th>{t("content.title")}</th>
-                <th>Slug</th>
-                <th>{t("content.status")}</th>
-                <th>{t("content.updated_at")}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {query.data.data.map((post) => (
-                <tr key={post.id}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(post.id)}
-                      onChange={(event) => {
-                        setSelectedIds((current) =>
-                          event.target.checked
-                            ? [...current, post.id]
-                            : current.filter((id) => id !== post.id),
-                        );
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <strong>{post.title}</strong>
-                    <small>{post.permalink}</small>
-                    {post.status === "scheduled" && post.published_at ? (
-                      <small className="schedule-hint">
-                        {t("content.scheduled_at", undefined, { time: new Date(post.published_at).toLocaleString() })}
-                      </small>
-                    ) : null}
-                  </td>
-                  <td>{post.slug}</td>
-                  <td>
-                    <span className={`badge ${post.status}`}>{t(`status.${post.status}`, post.status)}</span>
-                  </td>
-                  <td>{new Date(post.updated_at).toLocaleString()}</td>
-                  <td className="row-actions">
-                    <Link className="icon-button" to={`${basePath}/${post.id}/edit`} title={t("content.edit")}>
-                      <Edit3 size={16} />
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <Pagination
-            page={query.data.meta.page}
-            totalPages={query.data.meta.total_pages}
-            onPageChange={setPage}
+          <ContentTable
+            posts={query.data.data}
+            selectedIds={selectedIds}
+            basePath={basePath}
+            onSelectedIdsChange={setSelectedIds}
+            t={t}
           />
+          <ContentPagination page={query.data.meta.page} totalPages={query.data.meta.total_pages} onPageChange={setPage} t={t} />
           <ConfirmBox
             open={confirmBulkDelete}
             title={t("content.delete_selected_title", undefined, { title })}
@@ -242,30 +142,5 @@ export function ContentList({ type }: { type: PostType }) {
         </>
       ) : null}
     </section>
-  );
-}
-
-function Pagination({
-  page,
-  totalPages,
-  onPageChange,
-}: {
-  page: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) {
-  const { t } = useI18n();
-  return (
-    <div className="pagination-row">
-      <button className="subtle" disabled={page <= 1} onClick={() => onPageChange(Math.max(1, page - 1))}>
-        {t("action.previous")}
-      </button>
-      <span className="muted">
-        {page} / {Math.max(1, totalPages)}
-      </span>
-      <button className="subtle" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>
-        {t("action.next")}
-      </button>
-    </div>
   );
 }

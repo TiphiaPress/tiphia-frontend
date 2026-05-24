@@ -20,7 +20,7 @@ import { CustomPageDetail, PageDetail, PostDetail } from "../blog/pages/PostPage
 import { RegisterPage } from "../blog/pages/RegisterPage";
 import { TermArchive, TermDirectory } from "../blog/pages/Terms";
 import { Timeline } from "../blog/pages/Timeline";
-import { ExternalWarningPage } from "../themes/default/ExternalWarningPage";
+import { ExternalWarningPage } from "../blog/pages/ExternalWarningPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {

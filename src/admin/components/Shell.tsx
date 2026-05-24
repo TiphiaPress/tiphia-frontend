@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { clearSession, getStoredUser } from "../lib/auth";
+import { type AdminSection, canAccessAdminSection } from "../lib/permissions";
 import { adminPath } from "../lib/routes";
 import { FrontendHookSlot } from "../../framework/plugin-hooks";
 import { useI18n } from "../../framework/i18n";
@@ -20,16 +21,16 @@ import { Brand } from "./Brand";
 
 const PROJECT_REPOSITORY_URL = "https://github.com/TiphiaPress/tiphia";
 
-const links = [
-  { to: adminPath(), label: "总览", icon: LayoutDashboard },
-  { to: adminPath("/posts"), label: "文章", icon: FileText },
-  { to: adminPath("/pages"), label: "页面", icon: BookOpen },
-  { to: adminPath("/comments"), label: "评论", icon: MessageSquare },
-  { to: adminPath("/terms"), label: "分类标签", icon: Tags },
-  { to: adminPath("/users"), label: "用户", icon: Users },
-  { to: adminPath("/plugins"), label: "插件", icon: Boxes },
-  { to: adminPath("/themes"), label: "主题", icon: Palette },
-  { to: adminPath("/settings"), label: "设置", icon: Settings },
+const links: Array<{ section: AdminSection; to: string; label: string; icon: typeof LayoutDashboard }> = [
+  { section: "dashboard", to: adminPath(), label: "总览", icon: LayoutDashboard },
+  { section: "posts", to: adminPath("/posts"), label: "文章", icon: FileText },
+  { section: "pages", to: adminPath("/pages"), label: "页面", icon: BookOpen },
+  { section: "comments", to: adminPath("/comments"), label: "评论", icon: MessageSquare },
+  { section: "terms", to: adminPath("/terms"), label: "分类标签", icon: Tags },
+  { section: "users", to: adminPath("/users"), label: "用户", icon: Users },
+  { section: "plugins", to: adminPath("/plugins"), label: "插件", icon: Boxes },
+  { section: "themes", to: adminPath("/themes"), label: "主题", icon: Palette },
+  { section: "settings", to: adminPath("/settings"), label: "设置", icon: Settings },
 ];
 
 export function Shell() {
@@ -47,7 +48,7 @@ export function Shell() {
       <aside className="sidebar">
         <Brand subtitle="Admin Console" />
         <nav>
-          {links.map((link) => {
+          {links.filter((link) => canAccessAdminSection(user, link.section)).map((link) => {
             const Icon = link.icon;
             return (
               <NavLink key={link.to} to={link.to} end={link.to === adminPath()}>

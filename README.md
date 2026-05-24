@@ -1,6 +1,6 @@
 # Tiphia Frontend
 
-This repository contains the TiphiaPress frontend shell: the admin console, public blog routes, frontend plugin runtime, i18n runtime, and theme loading conventions.
+This repository contains the TiphiaPress frontend shell: the admin console, public blog runtime skeleton, frontend plugin runtime, i18n runtime, and theme loading conventions.
 
 ## Documentation
 
@@ -20,13 +20,14 @@ Useful sections:
 This frontend is intentionally decoupled from the backend. The backend is deployed from `TiphiaPress/tiphia`; this app is built as static assets and can be deployed to any static hosting provider.
 
 ```text
-src/admin/       Admin console pages and components
-src/blog/        Public blog routes and content components
+src/admin/       Admin console pages, components, and admin-owned assets
+src/blog/        Public blog runtime skeleton: routes, data fetching, SEO, mutations
 src/framework/   Plugin hooks, i18n, public API helpers
-src/plugins/     Frontend plugin packages
-src/themes/      Theme packages; default may be linked from tiphia-default-themes
-public/themes/   Theme static files such as /themes/default/favicon.ico
+src/plugins/     Frontend plugin packages, including plugin-owned assets and config UI
+src/themes/      Theme packages: public rendering, views, CSS, favicon, theme-owned assets
 ```
+
+There is intentionally no `public/` asset convention. Plugin files belong in their plugin package, and theme files belong in their theme package.
 
 ## Development
 
@@ -63,20 +64,31 @@ The output is `dist/` and can be hosted by Nginx, GitHub Pages, Cloudflare Pages
 
 ## Themes
 
-Themes are frontend modules. The default theme can be copied from `TiphiaPress/tiphia-default-themes` or linked into `src/themes/default` as a Git submodule.
+Themes are frontend source modules. The default theme can be copied from `TiphiaPress/tiphia-default-themes` or linked into `src/themes/default` as a Git submodule.
 
-Theme favicon files are read from:
-
-```text
-/themes/{themeName}/favicon.ico
-```
-
-For the default theme, place the file at:
+A theme should keep all assets in its own directory:
 
 ```text
-public/themes/default/favicon.ico
+src/themes/my-theme/
+  index.tsx
+  views.tsx
+  theme.css
+  favicon.ico
+  README.md
 ```
+
+The active theme's favicon is imported from the theme module registry, not from a global static folder.
 
 ## Frontend Plugins
 
 Frontend plugins register React hook contributions through `registerFrontendPlugin`. They can provide admin configuration panels, head effects, i18n resources, and blog/admin UI insertions.
+
+A plugin should keep all frontend files in its own package:
+
+```text
+src/plugins/my-plugin/
+  index.tsx
+  ConfigPanel.tsx
+  styles.css
+  README.md
+```
