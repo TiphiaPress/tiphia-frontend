@@ -18,7 +18,6 @@ export function GeetestHookBox({ mode, onVerify }: GeetestHookContext) {
   return (
     <>
       <GeetestBox config={geetest.data as GeetestPublicConfig} mode={mode} onVerify={onVerify} />
-      <p className="muted">请先完成验证码。</p>
     </>
   );
 }
@@ -89,7 +88,7 @@ function GeetestBox({
       <span>验证码</span>
       <div id={id} className="geetest-box" />
       {status === "loading" ? <small>验证码加载中...</small> : null}
-      {status === "ready" ? <small>完成验证码后再提交。</small> : null}
+      {status === "ready" ? <small>请先完成验证码。</small> : null}
       {status === "error" ? (
         <>
           <small className="error-text">
@@ -186,3 +185,5 @@ function loadGeetestScript() {
     document.head.appendChild(script);
   });
 }
+
+
