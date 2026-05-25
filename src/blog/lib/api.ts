@@ -73,6 +73,7 @@ export const api = {
     password: string;
     display_name?: string | null;
     captcha?: Record<string, unknown> | null;
+    extensions?: Record<string, unknown>;
   }) =>
     requestWithInit<TokenResponse>("/api/v1/auth/register", {
       method: "POST",
@@ -86,6 +87,7 @@ export const api = {
     author_url?: string | null;
     content: string;
     captcha?: Record<string, unknown> | null;
+    extensions?: Record<string, unknown>;
   }) =>
     requestWithInit<CommentNode>("/api/v1/comments", {
       method: "POST",

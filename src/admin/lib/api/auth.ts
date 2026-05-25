@@ -16,8 +16,13 @@ export const authApi = {
     password: string;
     display_name?: string | null;
     captcha?: Record<string, unknown> | null;
+    extensions?: Record<string, unknown>;
   }) => request<TokenResponse>("/api/v1/auth/register", post(input)),
-  login: (input: { account: string; password: string; captcha?: Record<string, unknown> | null }) =>
-    request<TokenResponse>("/api/v1/auth/login", post(input)),
+  login: (input: {
+    account: string;
+    password: string;
+    captcha?: Record<string, unknown> | null;
+    extensions?: Record<string, unknown>;
+  }) => request<TokenResponse>("/api/v1/auth/login", post(input)),
   me: () => request<PublicUser>("/api/v1/auth/me"),
 };

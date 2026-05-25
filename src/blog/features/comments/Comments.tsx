@@ -30,6 +30,7 @@ export function Comments({ postId }: { postId: number }) {
       author_url: form.author_url || null,
       content: form.content,
       captcha,
+      extensions: captcha ? { "tiphia-geetest": captcha } : {},
     }),
     onSuccess: async (comment) => {
       rememberCommentIdentity(form);
@@ -116,6 +117,7 @@ function CommentItem({
       author_url: form.author_url || null,
       content: form.content,
       captcha,
+      extensions: captcha ? { "tiphia-geetest": captcha } : {},
     }),
     onSuccess: async (comment) => {
       setReplying(false);

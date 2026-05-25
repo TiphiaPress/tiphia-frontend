@@ -20,6 +20,7 @@ export function RegisterPage() {
       password: form.password,
       display_name: form.display_name || null,
       captcha,
+      extensions: captcha ? { "tiphia-geetest": captcha } : {},
     }),
     onError: () => setCaptcha(null),
   });

@@ -23,6 +23,7 @@ export function Login() {
   const [displayName, setDisplayName] = useState("");
   const [password, setPassword] = useState("");
   const [captcha, setCaptcha] = useState<Record<string, unknown> | null>(null);
+  const [totpCode, setTotpCode] = useState("");
   const initialized = status.data?.initialized ?? true;
   const registrationEnabled = Boolean(status.data?.registration_enabled);
   const captchaRequired =
@@ -55,8 +56,17 @@ export function Login() {
             password,
             display_name: displayName,
             captcha,
+            extensions: captcha ? { "tiphia-geetest": captcha } : {},
           })
-          : api.login({ account, password, captcha }),
+          : api.login({
+              account,
+              password,
+              captcha,
+              extensions: {
+                ...(captcha ? { "tiphia-geetest": captcha } : {}),
+                ...(totpCode ? { "tiphia-authenticator": { totp_code: totpCode } } : {}),
+              },
+            }),
     onSuccess: (session) => {
       toast.success(mode === "bootstrap" ? "Root 已创建" : mode === "register" ? "注册成功" : "登录成功");
       if (!["root", "admin", "editor"].includes(session.user.role)) {
@@ -153,6 +163,7 @@ export function Login() {
             />
           </label>
           <FrontendHookSlot hook="admin.auth.captcha" context={{ mode, onVerify: setCaptcha }} />
+          {mode === "login" ? <FrontendHookSlot hook="admin.auth.form.after" context={{ mode, onTotpChange: setTotpCode }} /> : null}
           {login.error ? <p className="error-text">{login.error.message}</p> : null}
           <button type="submit" disabled={login.isPending || (mode === "register" && !registrationEnabled)}>
             {login.isPending ? "提交中..." : mode === "bootstrap" ? "创建 Root" : mode === "register" ? "注册" : "登录"}
