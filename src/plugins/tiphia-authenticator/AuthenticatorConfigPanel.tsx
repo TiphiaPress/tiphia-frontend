@@ -109,7 +109,7 @@ export function AuthenticatorConfigPanel({ plugin, value, saving, error, onSubmi
               {setup.data ? (
                 <div className="authenticator-setup">
                   <div className="authenticator-qr-shell">
-                    <div className="authenticator-qr" dangerouslySetInnerHTML={{ __html: setup.data.qr_svg }} />
+                    <div className="authenticator-qr"><img src={svgDataUri(setup.data.qr_svg)} alt="Authenticator QR Code" /></div>
                     <small>打开 Microsoft Authenticator，选择添加账号，然后扫描二维码。</small>
                   </div>
                   <label className="field authenticator-secret-field">
@@ -125,6 +125,10 @@ export function AuthenticatorConfigPanel({ plugin, value, saving, error, onSubmi
       </div>
     </div>
   );
+}
+
+function svgDataUri(svg: string) {
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
 }
 
 function readString(value: unknown) {

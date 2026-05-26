@@ -1,17 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { authenticatorConfig } from "./api";
-
 export function TotpLoginField({ onChange }: { onChange?: (value: string) => void }) {
-  const config = useQuery({
-    queryKey: ["authenticator-config"],
-    queryFn: authenticatorConfig,
-    retry: false,
-  });
-
-  if (config.error || !config.data?.enabled) {
-    return null;
-  }
-
   return (
     <label className="field authenticator-login-field">
       <span>Authenticator 动态码</span>
