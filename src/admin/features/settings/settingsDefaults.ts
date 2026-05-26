@@ -5,7 +5,7 @@ export const defaultSiteSettings: SiteSettings = {
   description: "A Rust blog powered by Tiphia.",
   avatar_url: "",
   gravatar_base_url: "https://www.gravatar.com/avatar/",
-  base_url: "http://127.0.0.1:3000",
+  base_url: "",
   timezone: "UTC",
   default_page_size: 20,
   comments_enabled: true,

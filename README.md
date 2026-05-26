@@ -48,11 +48,18 @@ Admin console:
 http://127.0.0.1:5173/admin
 ```
 
-Set the backend API base in `.env`:
+API base configuration in `.env`:
 
 ```bash
-VITE_TIPHIA_API_BASE=http://127.0.0.1:3000
+# Empty means same-origin requests, for example /api/v1/auth/status.
+# This is recommended for Nginx static deployment with /api/ reverse proxy.
+VITE_TIPHIA_API_BASE=
+
+# Use this only when the API is on another origin.
+# VITE_TIPHIA_API_BASE=https://api.example.com
 ```
+
+For runtime-only changes without rebuilding, define `window.__TIPHIA_API_BASE__` before the bundled app script in `index.html`.
 
 ## Build
 

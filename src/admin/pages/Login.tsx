@@ -162,8 +162,8 @@ export function Login() {
               onChange={(event) => setPassword(event.target.value)}
             />
           </label>
-          <FrontendHookSlot hook="admin.auth.captcha" context={{ mode, onVerify: setCaptcha }} />
           {mode === "login" ? <FrontendHookSlot hook="admin.auth.form.after" context={{ mode, onTotpChange: setTotpCode }} /> : null}
+          <FrontendHookSlot hook="admin.auth.captcha" context={{ mode, onVerify: setCaptcha }} />
           {login.error ? <p className="error-text">{login.error.message}</p> : null}
           <button type="submit" disabled={login.isPending || (mode === "register" && !registrationEnabled)}>
             {login.isPending ? "提交中..." : mode === "bootstrap" ? "创建 Root" : mode === "register" ? "注册" : "登录"}

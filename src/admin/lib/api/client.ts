@@ -1,7 +1,7 @@
+import { resolveApiBase } from "../../../framework/api-base";
 import { clearSession, getToken } from "../auth";
 
-const configuredBase = import.meta.env.VITE_TIPHIA_API_BASE as string | undefined;
-export const apiBase = (configuredBase || "http://127.0.0.1:3000").replace(/\/$/, "");
+export const apiBase = resolveApiBase();
 
 export class ApiError extends Error {
   status: number;

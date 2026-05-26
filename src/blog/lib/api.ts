@@ -1,3 +1,4 @@
+import { resolveApiBase } from "../../framework/api-base";
 import type {
   CommentNode,
   AuthStatus,
@@ -11,8 +12,7 @@ import type {
   TokenResponse,
 } from "../types";
 
-const configuredBase = import.meta.env.VITE_TIPHIA_API_BASE as string | undefined;
-export const apiBase = (configuredBase || "http://127.0.0.1:3000").replace(/\/$/, "");
+export const apiBase = resolveApiBase();
 
 async function request<T>(path: string): Promise<T> {
   return requestWithInit<T>(path);

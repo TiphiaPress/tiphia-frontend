@@ -1,5 +1,6 @@
-const configuredBase = import.meta.env.VITE_TIPHIA_API_BASE as string | undefined;
-export const publicApiBase = (configuredBase || "http://127.0.0.1:3000").replace(/\/$/, "");
+import { resolveApiBase } from "./api-base";
+
+export const publicApiBase = resolveApiBase();
 
 export async function requestPublic<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
