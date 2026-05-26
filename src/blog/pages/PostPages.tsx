@@ -47,7 +47,7 @@ export function PageDetail() {
   if (page.error) return <State text={page.error.message} tone="error" />;
   if (!page.data) return null;
 
-  return <Article post={page.data} />;
+  return <Article post={page.data} showComments comments={<Comments postId={page.data.id} />} />;
 }
 
 export function CustomPageDetail({ fixedSlug }: { fixedSlug?: string }) {
@@ -79,7 +79,7 @@ export function CustomPageDetail({ fixedSlug }: { fixedSlug?: string }) {
 function ThemePageRenderer({ post, navPage, slug }: { post: PostResponse; navPage?: ThemeNavPage; slug: string }) {
   const { Article, PlainPage } = useActiveThemeViews();
   if (navPage?.display === "plain") {
-    return <PlainPage post={post} navPage={navPage} slug={slug} />;
+    return <PlainPage post={post} navPage={navPage} slug={slug} showComments comments={<Comments postId={post.id} />} />;
   }
-  return <Article post={post} customPage={{ slug, navPage }} />;
+  return <Article post={post} customPage={{ slug, navPage }} showComments comments={<Comments postId={post.id} />} />;
 }

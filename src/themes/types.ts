@@ -34,7 +34,7 @@ export interface BlogThemeViews {
     comments?: ReactNode;
     customPage?: { slug: string; navPage?: ThemeNavPage };
   }>;
-  PlainPage: ComponentType<{ post: PostResponse; slug: string; navPage?: ThemeNavPage }>;
+  PlainPage: ComponentType<{ post: PostResponse; slug: string; navPage?: ThemeNavPage; showComments?: boolean; comments?: ReactNode }>;
   TermDirectory: ComponentType<{ type: "category" | "tag"; terms: TermResponse[] }>;
   TermArchive: ComponentType<{
     term?: TermResponse;
