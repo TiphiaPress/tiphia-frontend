@@ -38,6 +38,7 @@ export interface RecentComment {
   updated_at: string;
   post_slug: string;
   post_title: string;
+  post_type?: "post" | "page";
 }
 
 export interface SiteSettings {
@@ -140,3 +141,5 @@ export interface TokenResponse {
     status: "active" | "disabled";
   };
 }
+
+
