@@ -1,6 +1,6 @@
 # Frontend Plugins
 
-Each frontend plugin lives in its own folder:
+Frontend plugins are compile-time source packages. Each plugin lives in its own folder and is automatically loaded by `src/plugins/index.ts` when it provides an `index.ts` or `index.tsx` entry.
 
 ```text
 src/plugins/my-plugin/
@@ -9,30 +9,27 @@ src/plugins/my-plugin/
   styles.css
 ```
 
+You no longer need to edit `src/plugins/index.ts` for each new plugin. The loader uses:
+
+```ts
+import.meta.glob(["./*/index.ts", "./*/index.tsx"], { eager: true });
+```
+
+So the only requirement is: put the plugin entry at `src/plugins/<plugin-name>/index.tsx` or `index.ts`.
+
+## Basic plugin
+
 Register the plugin from `index.tsx`:
 
 ```tsx
-import { registerFrontendPlugin } from "../framework/plugin-hooks";
+import { registerFrontendPlugin } from "../../framework/plugin-hooks";
+import { ConfigPanel } from "./ConfigPanel";
+import "./styles.css";
 
 registerFrontendPlugin({
   name: "my-plugin",
+  backendNames: ["my-plugin"],
   adminConfigPanel: ConfigPanel,
-  i18n: {
-    locales: [
-      { code: "ja-JP", label: "日本語" },
-    ],
-    resources: {
-      "zh-CN": {
-        "my_plugin.title": "我的插件",
-      },
-      "en-US": {
-        "my_plugin.title": "My plugin",
-      },
-      "ja-JP": {
-        "my_plugin.title": "私のプラグイン",
-      },
-    },
-  },
   hooks: [
     {
       hook: "blog.footer.before",
@@ -40,21 +37,8 @@ registerFrontendPlugin({
       render: (context) => <div>{String(context.title)}</div>,
     },
   ],
-  head: [
-    {
-      id: "my-plugin-head",
-      run: () => {
-        const script = document.createElement("script");
-        script.src = "https://example.com/sdk.js";
-        document.head.appendChild(script);
-        return () => script.remove();
-      },
-    },
-  ],
 });
 ```
-
-Then import it from `src/plugins/index.ts`.
 
 ## i18n packages
 
@@ -77,5 +61,27 @@ registerFrontendPlugin({
 });
 ```
 
-Plugin messages override the same locale/key in the core dictionary, so normal
-plugins can ship their own admin panel translations next to their components.
+Plugin messages override the same locale/key in the core dictionary, so normal plugins can ship their own admin panel translations next to their components.
+
+## Head effects
+
+Plugins can register head side effects:
+
+```tsx
+registerFrontendPlugin({
+  name: "my-plugin",
+  head: [
+    {
+      id: "my-plugin-head",
+      run: () => {
+        const script = document.createElement("script");
+        script.src = "https://example.com/sdk.js";
+        document.head.appendChild(script);
+        return () => script.remove();
+      },
+    },
+  ],
+});
+```
+
+Keep assets, styles and config panels inside the plugin directory. Do not put plugin-owned files in `public/`.

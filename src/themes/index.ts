@@ -1,56 +1,26 @@
-import { DefaultThemeLayout } from "./default";
-import { DefaultThemeConfigPanel } from "./default/ThemeConfigPanel";
-import defaultFaviconUrl from "./default/favicon.ico";
-import { DefaultExternalWarningView } from "./default/ExternalWarningPage";
-import { PostCard, PostStats } from "./default/components/PostCard";
-import { State } from "./default/components/State";
-import { PopularPosts, RecentComments } from "./default/components/Widgets";
-import {
-  DefaultArticleView,
-  DefaultCommentFormView,
-  DefaultCommentItemView,
-  DefaultCommentsView,
-  DefaultHomeView,
-  DefaultPlainPageView,
-  DefaultRegisterView,
-  DefaultTermArchiveView,
-  DefaultTermDirectoryView,
-  DefaultTimelineView,
-} from "./default/views";
 import type { BlogTheme } from "./types";
 
-const themes: Record<string, BlogTheme> = {
-  default: {
-    name: "default",
-    faviconUrl: defaultFaviconUrl,
-    ConfigPanel: DefaultThemeConfigPanel,
-    Layout: DefaultThemeLayout,
-    views: {
-      State,
-      PostCard,
-      PostStats,
-      PopularPosts,
-      RecentComments,
-      Home: DefaultHomeView,
-      Article: DefaultArticleView,
-      PlainPage: DefaultPlainPageView,
-      TermDirectory: DefaultTermDirectoryView,
-      TermArchive: DefaultTermArchiveView,
-      Timeline: DefaultTimelineView,
-      Register: DefaultRegisterView,
-      Comments: DefaultCommentsView,
-      CommentItem: DefaultCommentItemView,
-      ExternalWarning: DefaultExternalWarningView,
-      CommentForm: DefaultCommentFormView,
-    },
-  },
+type ThemeModule = {
+  default?: BlogTheme;
+  theme?: BlogTheme;
 };
 
+const themeModules = import.meta.glob<ThemeModule>(["./*/index.ts", "./*/index.tsx"], { eager: true });
+const themeList = Object.values(themeModules)
+  .map((module) => module.default || module.theme)
+  .filter((theme): theme is BlogTheme => Boolean(theme?.name && theme.Layout && theme.views));
+
+const themes: Record<string, BlogTheme> = Object.fromEntries(themeList.map((theme) => [theme.name, theme]));
+const fallbackTheme = themes.default || themeList[0];
+
+if (!fallbackTheme) {
+  throw new Error("No Tiphia theme registered. Add a theme under src/themes/<name>/index.tsx.");
+}
+
 export function themeFor(name?: string | null) {
-  return themes[name || ""] || themes.default;
+  return themes[name || ""] || fallbackTheme;
 }
 
 export function registeredThemes() {
   return Object.values(themes);
 }
-
