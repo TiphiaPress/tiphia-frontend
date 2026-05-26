@@ -60,6 +60,16 @@ export function Comments() {
       toast.error(error instanceof Error ? error.message : t("comments.update_failed"));
     },
   });
+  const reply = useMutation({
+    mutationFn: ({ id, content }: { id: number; content: string }) => api.replyComment(id, content),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["comments"] });
+      toast.success(t("comments.replied", "回复已发送"));
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : t("comments.reply_failed", "回复失败"));
+    },
+  });
   const bulkModerate = useMutation({
     mutationFn: async (next: CommentStatus) => {
       await Promise.all(selectedIds.map((id) => api.moderateComment(id, next)));
@@ -108,8 +118,10 @@ export function Comments() {
             page={query.data}
             selectedIds={selectedIds}
             moderatePending={moderate.isPending}
+            replyPending={reply.isPending}
             onSelectedIdsChange={setSelectedIds}
             onModerate={(id, next) => moderate.mutate({ id, next })}
+            onReply={(id, content) => reply.mutate({ id, content })}
             t={t}
           />
           <div className="pagination-row">
@@ -128,3 +140,4 @@ export function Comments() {
     </section>
   );
 }
+

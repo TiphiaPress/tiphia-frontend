@@ -59,6 +59,12 @@ export interface HookContribution {
   render: (context: HookContext) => ReactNode;
 }
 
+export interface FrontendRouteContribution {
+  path: string;
+  element: ReactNode;
+  order?: number;
+}
+
 export interface HeadContribution {
   id: string;
   order?: number;
@@ -71,6 +77,7 @@ export interface FrontendPlugin {
   adminConfigPanel?: PluginConfigPanel;
   hooks?: HookContribution[];
   head?: HeadContribution[];
+  routes?: FrontendRouteContribution[];
   i18n?: {
     resources: I18nResources;
     locales?: LocaleOption[];
@@ -96,6 +103,14 @@ export function frontendPlugin(name: string) {
 
 export function adminConfigPanelFor(name: string) {
   return frontendPlugin(name)?.adminConfigPanel;
+}
+
+export function frontendPluginRoutes() {
+  return Array.from(plugins.values())
+    .flatMap((plugin) =>
+      (plugin.routes || []).map((route) => ({ ...route, plugin: plugin.name })),
+    )
+    .sort((left, right) => (left.order || 100) - (right.order || 100));
 }
 
 export function FrontendPluginProvider({
@@ -161,3 +176,4 @@ function isPluginEnabled(plugin: FrontendPlugin, enabledPlugins: Set<string> | n
 function enabledPluginsKey(enabledPlugins: Set<string> | null) {
   return enabledPlugins ? Array.from(enabledPlugins).sort().join("\n") : "";
 }
+

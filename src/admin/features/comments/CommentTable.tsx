@@ -1,16 +1,19 @@
-import { Check, ShieldAlert, Trash2 } from "lucide-react";
+import { Check, MessageSquareReply, ShieldAlert, Trash2 } from "lucide-react";
+import { useState } from "react";
 import type { Comment, CommentStatus, Page } from "../../types";
 
 interface CommentTableProps {
   page: Page<Comment>;
   selectedIds: number[];
   moderatePending: boolean;
+  replyPending: boolean;
   onSelectedIdsChange: (updater: (current: number[]) => number[]) => void;
   onModerate: (id: number, next: CommentStatus) => void;
+  onReply: (id: number, content: string) => void;
   t: (key: string, fallback?: string, vars?: Record<string, string | number>) => string;
 }
 
-export function CommentTable({ page, selectedIds, moderatePending, onSelectedIdsChange, onModerate, t }: CommentTableProps) {
+export function CommentTable({ page, selectedIds, moderatePending, replyPending, onSelectedIdsChange, onModerate, onReply, t }: CommentTableProps) {
   const comments = page.data;
   return (
     <table className="data-table">
@@ -38,11 +41,12 @@ export function CommentTable({ page, selectedIds, moderatePending, onSelectedIds
             key={comment.id}
             comment={comment}
             selected={selectedIds.includes(comment.id)}
-            pending={moderatePending}
+            pending={moderatePending || replyPending}
             onSelect={(selected) => {
               onSelectedIdsChange((current) => selected ? [...current, comment.id] : current.filter((id) => id !== comment.id));
             }}
             onModerate={onModerate}
+            onReply={onReply}
             t={t}
           />
         ))}
@@ -57,6 +61,7 @@ function CommentRow({
   pending,
   onSelect,
   onModerate,
+  onReply,
   t,
 }: {
   comment: Comment;
@@ -64,8 +69,13 @@ function CommentRow({
   pending: boolean;
   onSelect: (selected: boolean) => void;
   onModerate: (id: number, next: CommentStatus) => void;
+  onReply: (id: number, content: string) => void;
   t: (key: string, fallback?: string, vars?: Record<string, string | number>) => string;
 }) {
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [replyContent, setReplyContent] = useState("");
+  const canSubmitReply = replyContent.trim().length > 0 && !pending;
+
   return (
     <tr className={pending ? "mutating-row" : ""}>
       <td>
@@ -81,12 +91,44 @@ function CommentRow({
           <p className="comment-detail">{comment.content}</p>
         </details>
         <small>{t("comments.post_id", undefined, { postId: comment.post_id })}</small>
+        {replyOpen ? (
+          <div className="comment-reply-box">
+            <textarea
+              rows={3}
+              value={replyContent}
+              onChange={(event) => setReplyContent(event.target.value)}
+              placeholder={t("comments.reply_placeholder", "输入回复内容")}
+            />
+            <div>
+              <button className="button" disabled={!canSubmitReply} onClick={() => {
+                const content = replyContent.trim();
+                if (!content) return;
+                onReply(comment.id, content);
+                setReplyContent("");
+                setReplyOpen(false);
+              }}>
+                {t("comments.reply_submit", "发送回复")}
+              </button>
+              <button className="button subtle" type="button" onClick={() => setReplyOpen(false)}>
+                {t("action.cancel", "取消")}
+              </button>
+            </div>
+          </div>
+        ) : null}
       </td>
       <td>
         <span className={"badge " + comment.status}>{t("comment_status." + comment.status, comment.status)}</span>
       </td>
       <td>{new Date(comment.created_at).toLocaleString()}</td>
       <td className="row-actions">
+        <button
+          className="icon-button"
+          title={t("comments.reply", "回复")}
+          disabled={pending}
+          onClick={() => setReplyOpen((value) => !value)}
+        >
+          <MessageSquareReply size={16} />
+        </button>
         <button
           className="icon-button"
           title={t("comments.approve")}

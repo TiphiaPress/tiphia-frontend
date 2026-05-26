@@ -11,7 +11,7 @@ export const defaultSiteSettings: SiteSettings = {
   comments_enabled: true,
   comment_moderation: true,
   registration_enabled: false,
-  permalink_format: "/archives/{slug}",
+  permalink_format: "/posts/{slug}",
   theme: {
     active: "default",
     configs: {},

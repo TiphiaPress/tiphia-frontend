@@ -21,6 +21,7 @@ import { RegisterPage } from "../blog/pages/RegisterPage";
 import { TermArchive, TermDirectory } from "../blog/pages/Terms";
 import { Timeline } from "../blog/pages/Timeline";
 import { ExternalWarningPage } from "../blog/pages/ExternalWarningPage";
+import { frontendPluginRoutes } from "../framework/plugin-hooks";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,6 +33,7 @@ const queryClient = new QueryClient({
 });
 
 export function UnifiedApp() {
+  const pluginRoutes = frontendPluginRoutes();
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
@@ -70,6 +72,9 @@ export function UnifiedApp() {
               <Route path="custom-pages/:slug" element={<CustomPageDetail />} />
               <Route path="terms/:id" element={<TermArchive />} />
             </Route>
+            {pluginRoutes.map((route) => (
+              <Route key={`${route.plugin}:${route.path}`} path={route.path} element={route.element} />
+            ))}
             <Route path="/login" element={<Navigate to="/admin/login" replace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
@@ -79,3 +84,4 @@ export function UnifiedApp() {
     </QueryClientProvider>
   );
 }
+

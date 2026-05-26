@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { getStoredUser } from "../../../admin/lib/auth";
+import type { PublicUser } from "../../../admin/types";
 import { useActiveThemeViews } from "../../hooks/useActiveThemeViews";
 import {
   type CommentFormState,
@@ -18,22 +20,28 @@ export function Comments({ postId }: { postId: number }) {
   const geetest = useQuery({ queryKey: ["geetest-config"], queryFn: api.geetestConfig, retry: false });
   const comments = useQuery({ queryKey: ["comments", postId], queryFn: () => api.comments(postId) });
   const [form, setForm] = useRememberedCommentForm();
+  const currentUser = getStoredUser();
   const [captcha, setCaptcha] = useState<Record<string, unknown> | null>(null);
   const [successText, setSuccessText] = useState("");
   const captchaRequired = Boolean(geetest.data?.enabled && geetest.data.verify_comment);
   const submit = useMutation({
-    mutationFn: () => api.createComment({
-      post_id: postId,
-      parent_id: null,
-      author_name: form.author_name,
-      author_email: form.author_email,
-      author_url: form.author_url || null,
-      content: form.content,
-      captcha,
-      extensions: captcha ? { "tiphia-geetest": captcha } : {},
-    }),
+    mutationFn: () => {
+      const identity = commentIdentity(form, currentUser);
+      return api.createComment({
+        post_id: postId,
+        parent_id: null,
+        author_name: identity.author_name,
+        author_email: identity.author_email,
+        author_url: identity.author_url,
+        content: form.content,
+        captcha,
+        extensions: captcha ? { "tiphia-geetest": captcha } : {},
+      });
+    },
     onSuccess: async (comment) => {
-      rememberCommentIdentity(form);
+      if (!currentUser) {
+        rememberCommentIdentity(form);
+      }
       setForm({ ...form, content: "" });
       setCaptcha(null);
       setSuccessText(
@@ -57,6 +65,7 @@ export function Comments({ postId }: { postId: number }) {
         <CommentForm
           title="发表评论"
           form={form}
+          currentUser={currentUser}
           onFormChange={setForm}
           pending={submit.isPending}
           error={submit.error}
@@ -105,23 +114,29 @@ function CommentItem({
   const geetest = useQuery({ queryKey: ["geetest-config"], queryFn: api.geetestConfig, retry: false });
   const [replying, setReplying] = useState(false);
   const [form, setForm] = useRememberedCommentForm();
+  const currentUser = getStoredUser();
   const [captcha, setCaptcha] = useState<Record<string, unknown> | null>(null);
   const [successText, setSuccessText] = useState("");
   const captchaRequired = Boolean(geetest.data?.enabled && geetest.data.verify_comment);
   const reply = useMutation({
-    mutationFn: () => api.createComment({
-      post_id: postId,
-      parent_id: comment.id,
-      author_name: form.author_name,
-      author_email: form.author_email,
-      author_url: form.author_url || null,
-      content: form.content,
-      captcha,
-      extensions: captcha ? { "tiphia-geetest": captcha } : {},
-    }),
+    mutationFn: () => {
+      const identity = commentIdentity(form, currentUser);
+      return api.createComment({
+        post_id: postId,
+        parent_id: comment.id,
+        author_name: identity.author_name,
+        author_email: identity.author_email,
+        author_url: identity.author_url,
+        content: form.content,
+        captcha,
+        extensions: captcha ? { "tiphia-geetest": captcha } : {},
+      });
+    },
     onSuccess: async (comment) => {
       setReplying(false);
-      rememberCommentIdentity(form);
+      if (!currentUser) {
+        rememberCommentIdentity(form);
+      }
       setForm({ ...form, content: "" });
       setCaptcha(null);
       setSuccessText(comment.status === "approved" ? "回复已提交并显示。" : "回复已提交，等待审核后显示。");
@@ -141,6 +156,7 @@ function CommentItem({
         <ThemedCommentForm
           title={`回复 ${comment.author_name}`}
           form={form}
+          currentUser={currentUser}
           setForm={setForm}
           pending={reply.isPending}
           error={reply.error}
@@ -177,6 +193,7 @@ function CommentItem({
 function ThemedCommentForm({
   title,
   form,
+  currentUser,
   setForm,
   pending,
   error,
@@ -188,6 +205,7 @@ function ThemedCommentForm({
 }: {
   title: string;
   form: CommentFormState;
+  currentUser?: PublicUser | null;
   setForm: (form: CommentFormState) => void;
   pending: boolean;
   error: unknown;
@@ -202,6 +220,7 @@ function ThemedCommentForm({
     <CommentForm
       title={title}
       form={form}
+      currentUser={currentUser}
       onFormChange={setForm}
       pending={pending}
       error={error}
@@ -212,6 +231,22 @@ function ThemedCommentForm({
       onSubmit={onSubmit}
     />
   );
+}
+
+function commentIdentity(form: CommentFormState, user: PublicUser | null) {
+  if (user) {
+    return {
+      author_name: user.display_name || user.username,
+      author_email: user.email,
+      author_url: null,
+    };
+  }
+
+  return {
+    author_name: form.author_name,
+    author_email: form.author_email,
+    author_url: form.author_url || null,
+  };
 }
 
 function commentsForDepth(comment: CommentNode, depth: number) {

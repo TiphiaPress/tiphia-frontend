@@ -2087,3 +2087,25 @@ table.data-table {
     height: 40px;
   }
 }
+.comment-reply-box {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid var(--border, #d8e0ec);
+  border-radius: 8px;
+  background: var(--panel-muted, #f8fafc);
+}
+
+.comment-reply-box textarea {
+  width: 100%;
+  min-height: 76px;
+  resize: vertical;
+}
+
+.comment-reply-box > div {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+

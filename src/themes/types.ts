@@ -1,4 +1,5 @@
 import type { ComponentType, ReactNode } from "react";
+import type { PublicUser } from "../admin/types";
 import type { DefaultThemeLayoutProps } from "./default";
 import type { CommentFormState } from "../blog/hooks/useRememberedCommentForm";
 import type { ThemeNavPage } from "../blog/lib/theme";
@@ -71,6 +72,7 @@ export interface BlogThemeViews {
   CommentForm: ComponentType<{
     title: string;
     form: CommentFormState;
+    currentUser?: PublicUser | null;
     pending: boolean;
     error: unknown;
     successText: string;
