@@ -2,8 +2,8 @@ export type SmtpEncryption = "none" | "ssl" | "tls";
 
 export const defaultCommentEmailTemplate = `<h2>收到新评论</h2>
 <p><strong>文章：</strong><a href="{{post_url}}">{{post_title}}</a></p>
-<p><strong>文章作者：</strong>{{sender_name}}</p>
-<p><strong>评论者：</strong>{{commenter_name}} &lt;{{commenter_email}}&gt;</p>
+<p><strong>评论者：</strong>{{sender_name}} &lt;{{sender_email}}&gt;</p>
+<p><strong>文章作者：</strong>{{post_author_name}}</p>
 <p><strong>状态：</strong>{{comment_status}}</p>
 <blockquote>{{comment_content}}</blockquote>`;
 
