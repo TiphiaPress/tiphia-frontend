@@ -48,18 +48,25 @@ Admin console:
 http://127.0.0.1:5173/admin
 ```
 
-API base configuration in `.env`:
+API base configuration:
 
 ```bash
-# Empty means same-origin requests, for example /api/v1/auth/status.
-# This is recommended for Nginx static deployment with /api/ reverse proxy.
+# Recommended for Nginx static deployment with /api/ reverse proxy.
+# The frontend will request /api/v1/... on the same origin.
 VITE_TIPHIA_API_BASE=
 
-# Use this only when the API is on another origin.
+# Use this only when the backend API is on another origin.
+# Do not include a trailing slash.
 # VITE_TIPHIA_API_BASE=https://api.example.com
 ```
 
-For runtime-only changes without rebuilding, define `window.__TIPHIA_API_BASE__` before the bundled app script in `index.html`.
+Common deployment modes:
+
+- Same-origin Nginx proxy: leave `VITE_TIPHIA_API_BASE` empty and proxy `/api/` to the backend.
+- Separate API domain: set `VITE_TIPHIA_API_BASE=https://api.example.com` before `yarn build`.
+- Runtime override: define `window.__TIPHIA_API_BASE__ = "https://api.example.com"` before the bundled app script in `index.html`.
+
+If production requests still go to `http://127.0.0.1:3000`, the deployed `dist/` was built with a development API base or an old bundle is cached. Rebuild and redeploy `dist/`, then clear CDN/browser cache.
 
 ## Build
 
