@@ -98,9 +98,11 @@ export interface BlogTheme {
   name: string;
   faviconUrl?: string;
   ConfigPanel?: ThemeConfigPanel;
+  BootstrapLoading?: ComponentType;
   Layout: BlogThemeLayout;
   views: BlogThemeViews;
 }
+
 
 
 

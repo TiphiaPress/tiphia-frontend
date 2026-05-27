@@ -10,7 +10,9 @@ export function Layout() {
   const settings = useQuery({ queryKey: ["settings"], queryFn: api.settings });
   const terms = useQuery({ queryKey: ["terms"], queryFn: api.terms });
   const themeConfig = settings.data?.theme.config || {};
-  const ThemeLayout = themeFor(settings.data?.theme.active).Layout;
+  const theme = themeFor(settings.data?.theme.active);
+  const ThemeLayout = theme.Layout;
+  const BootstrapLoading = theme.BootstrapLoading || themeFor("default").BootstrapLoading;
   const navPages = themeNavPages(themeConfig);
   const plugins = useQuery({
     queryKey: ["frontend-plugins"],
@@ -30,6 +32,10 @@ export function Layout() {
     apiBaseUrl: apiBase,
   });
 
+  if (BootstrapLoading && ((settings.isLoading && !settings.data) || (terms.isLoading && !terms.data))) {
+    return <BootstrapLoading />;
+  }
+
   return (
     <FrontendPluginProvider enabledPlugins={activePlugins}>
       <ThemeLayout
@@ -45,3 +51,4 @@ export function Layout() {
     </FrontendPluginProvider>
   );
 }
+
