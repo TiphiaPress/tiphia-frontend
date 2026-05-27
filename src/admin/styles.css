@@ -2109,3 +2109,119 @@ table.data-table {
   justify-content: flex-end;
 }
 
+
+.editor-category-list {
+  max-height: 150px;
+}
+
+.editor-tag-field small {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.editor-tag-input-wrap {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 8px;
+}
+
+.editor-tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+.editor-tag-chips input {
+  flex: 1 1 150px;
+  min-width: 120px;
+  min-height: 30px;
+  border: 0;
+  background: transparent;
+  padding: 4px 2px;
+  outline: 0;
+}
+
+.editor-tag-chip {
+  display: inline-flex;
+  max-width: 100%;
+  min-height: 30px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  color: var(--text);
+  padding: 4px 9px;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.editor-tag-chip span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-tag-chip svg {
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
+.editor-tag-chip:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+  background: color-mix(in srgb, var(--accent) 13%, var(--surface));
+}
+
+.editor-term-search {
+  min-height: 34px;
+}
+.editor-tag-suggestions {
+  display: grid;
+  max-height: 180px;
+  overflow: auto;
+  border-top: 1px solid var(--border);
+  margin: 8px -8px -8px;
+  padding: 6px;
+}
+
+.editor-tag-suggestions > button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  justify-content: stretch;
+  gap: 8px;
+  width: 100%;
+  min-height: 34px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text);
+  padding: 6px 8px;
+  text-align: left;
+  transform: none;
+}
+
+.editor-tag-suggestions > button:hover {
+  background: var(--panel-soft);
+  box-shadow: none;
+  color: var(--text);
+  transform: none;
+}
+
+.editor-tag-suggestions span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.editor-tag-suggestions small {
+  color: var(--muted);
+  font-size: 12px;
+}

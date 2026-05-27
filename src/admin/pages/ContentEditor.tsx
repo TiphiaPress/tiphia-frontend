@@ -10,8 +10,8 @@ import { api } from "../lib/api";
 import { adminPath } from "../lib/routes";
 import { EditorMainPanel } from "../features/content-editor/EditorMainPanel";
 import { EditorSidePanel } from "../features/content-editor/EditorSidePanel";
-import { emptyPost } from "../features/content-editor/editorModel";
-import type { PostType, TermType } from "../types";
+import { emptyPost, slugify } from "../features/content-editor/editorModel";
+import type { PostType, Term, TermType } from "../types";
 
 export function ContentEditor({ type }: { type: PostType }) {
   const { id } = useParams();
@@ -24,8 +24,8 @@ export function ContentEditor({ type }: { type: PostType }) {
   const title = type === "page" ? t("content.page") : t("content.post");
   const basePath = adminPath(type === "page" ? "/pages" : "/posts");
   const [form, setForm] = useState(emptyPost);
-  const [selectedTermIds, setSelectedTermIds] = useState<number[]>([]);
-  const [termType, setTermType] = useState<TermType>("category");
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+  const [selectedTagNames, setSelectedTagNames] = useState<string[]>([]);
   const [saveAction, setSaveAction] = useState<"stay" | "return">("stay");
   const [previewRevisionId, setPreviewRevisionId] = useState<number | null>(null);
   const [restoreTarget, setRestoreTarget] = useState<{ id: number; createdAt: string } | null>(null);
@@ -35,9 +35,13 @@ export function ContentEditor({ type }: { type: PostType }) {
     queryFn: () => api.getAdminPost(type, numericId),
     enabled: !isNew,
   });
-  const allTerms = useQuery({
-    queryKey: ["terms", termType],
-    queryFn: () => api.listTerms({ page: 1, per_page: 100, term_type: termType }),
+  const categories = useQuery({
+    queryKey: ["terms", "category", "all"],
+    queryFn: () => fetchAllTerms("category"),
+  });
+  const tags = useQuery({
+    queryKey: ["terms", "tag", "all"],
+    queryFn: () => fetchAllTerms("tag"),
   });
   const boundTerms = useQuery({
     queryKey: ["content-terms", type, numericId],
@@ -65,7 +69,8 @@ export function ContentEditor({ type }: { type: PostType }) {
 
   useEffect(() => {
     if (boundTerms.data) {
-      setSelectedTermIds(boundTerms.data.map((term) => term.id));
+      setSelectedCategoryIds(boundTerms.data.filter((term) => term.term_type === "category").map((term) => term.id));
+      setSelectedTagNames(uniqueNames(boundTerms.data.filter((term) => term.term_type === "tag").map((term) => term.name)));
     }
   }, [boundTerms.data]);
 
@@ -80,12 +85,12 @@ export function ContentEditor({ type }: { type: PostType }) {
     },
     onSuccess: async (saved) => {
       const savedId = isNew ? saved.id : numericId;
-      if (selectedTermIds.length > 0 || !isNew) {
-        await api.syncPostTerms(type, savedId, selectedTermIds);
-      }
+      const tagIds = await resolveTagIds(selectedTagNames, tags.data || []);
+      await api.syncPostTerms(type, savedId, [...selectedCategoryIds, ...tagIds]);
       await queryClient.invalidateQueries({ queryKey: ["content"] });
       await queryClient.invalidateQueries({ queryKey: ["content-terms"] });
       await queryClient.invalidateQueries({ queryKey: ["content-revisions"] });
+      await queryClient.invalidateQueries({ queryKey: ["terms"] });
       toast.success(t("editor.saved", undefined, { title }));
       if (saveAction === "return") {
         navigate(basePath);
@@ -154,9 +159,10 @@ export function ContentEditor({ type }: { type: PostType }) {
 
         <EditorSidePanel
           form={form}
-          terms={allTerms.data?.data || []}
-          selectedTermIds={selectedTermIds}
-          termType={termType}
+          categories={categories.data || []}
+          tags={tags.data || []}
+          selectedCategoryIds={selectedCategoryIds}
+          selectedTagNames={selectedTagNames}
           isNew={isNew}
           savePending={save.isPending}
           deletePending={remove.isPending}
@@ -167,8 +173,8 @@ export function ContentEditor({ type }: { type: PostType }) {
           revisionsLoading={revisions.isLoading}
           previewRevisionId={previewRevisionId}
           onFormChange={setForm}
-          onTermTypeChange={setTermType}
-          onSelectedTermIdsChange={setSelectedTermIds}
+          onSelectedCategoryIdsChange={setSelectedCategoryIds}
+          onSelectedTagNamesChange={setSelectedTagNames}
           onSaveActionChange={setSaveAction}
           onDelete={() => remove.mutate()}
           onPreviewRevision={setPreviewRevisionId}
@@ -198,7 +204,69 @@ export function ContentEditor({ type }: { type: PostType }) {
   );
 }
 
+async function fetchAllTerms(termType: TermType) {
+  const first = await api.listTerms({ page: 1, per_page: 100, term_type: termType });
+  const pages = [first];
+  for (let page = 2; page <= first.meta.total_pages; page += 1) {
+    pages.push(await api.listTerms({ page, per_page: 100, term_type: termType }));
+  }
+  return pages.flatMap((page) => page.data);
+}
 
+async function resolveTagIds(names: string[], knownTags: TermLike[]) {
+  const ids: number[] = [];
+  let tagPool: TermLike[] = knownTags;
+  for (const name of uniqueNames(names)) {
+    let tag = findTagByName(tagPool, name);
+    if (!tag) {
+      try {
+        tag = await api.createTerm({
+          name,
+          slug: slugify(name),
+          term_type: "tag",
+          description: "",
+          parent_id: null,
+          sort_order: 0,
+        });
+      } catch (error) {
+        tagPool = await fetchAllTerms("tag");
+        tag = findTagByName(tagPool, name);
+        if (!tag) {
+          throw error;
+        }
+      }
+    }
+    if (tag) {
+      ids.push(tag.id);
+    }
+  }
+  return Array.from(new Set(ids));
+}
 
+type TermLike = Pick<Term, "id" | "slug" | "name">;
+
+function findTagByName(tags: TermLike[], name: string): TermLike | undefined {
+  const normalized = normalizeName(name);
+  const slug = slugify(name).toLowerCase();
+  return tags.find((tag) => normalizeName(tag.name) === normalized || tag.slug.toLowerCase() === slug);
+}
+
+function uniqueNames(names: string[]) {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const name of names) {
+    const normalized = normalizeName(name);
+    if (!normalized || seen.has(normalized)) {
+      continue;
+    }
+    seen.add(normalized);
+    result.push(name.trim().replace(/\s+/g, " "));
+  }
+  return result;
+}
+
+function normalizeName(name: string) {
+  return name.trim().replace(/\s+/g, " ").toLowerCase();
+}
 
 
