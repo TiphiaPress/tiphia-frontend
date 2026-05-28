@@ -40,6 +40,7 @@ export function normalizeLanguage(language: string): string {
 export function detectLanguage(code: Element, source: string) {
   const explicit = readExplicitLanguage(code);
   if (explicit) return explicit;
+  if (looksLikePhp(source)) return "php";
   if (looksLikeSql(source)) return "sql";
   if (looksLikeShell(source)) return "bash";
   if (/\b(#include|std::|cout|cin|namespace)\b/.test(source)) return "cpp";
@@ -82,6 +83,17 @@ function readExplicitLanguage(code: Element) {
   return className.split(/\s+/).map((item) => item.trim()).filter(Boolean).find((item) => knownLanguageAlias(item, window.Prism?.languages));
 }
 
+
+function looksLikePhp(source: string) {
+  const trimmed = source.trim();
+  if (/<\?(?:php|=)?/i.test(trimmed)) return true;
+  if (/\b(?:namespace|use)\s+[A-Z_a-z\\][\w\\]*\s*;/m.test(trimmed) && /\$[A-Za-z_]\w*/.test(trimmed)) return true;
+  if (/\b(?:public|protected|private)\s+(?:static\s+)?function\s+\w+\s*\(/.test(trimmed)) return true;
+  if (/\b(?:echo|print|require|require_once|include|include_once|array|isset|empty|unset)\b/.test(trimmed) && /\$[A-Za-z_]\w*/.test(trimmed)) return true;
+  if (/\$[A-Za-z_]\w*\s*=/.test(trimmed) && /(?:;|->|::)/.test(trimmed)) return true;
+  if (/\bclass\s+\w+(?:\s+(?:extends|implements)\s+\w+)?\s*\{/.test(trimmed) && /\$[A-Za-z_]\w*/.test(trimmed)) return true;
+  return false;
+}
 function looksLikeShell(source: string) {
   const trimmed = source.trim();
   if (/^#!\s*\/.*\b(?:ba|z|fi|c)?sh\b/m.test(trimmed)) return true;
@@ -94,3 +106,5 @@ function looksLikeSql(source: string) {
   const sqlPunctuation = /;\s*(?:\r?\n|$)/;
   return sqlKeywords.test(source) && (sqlPunctuation.test(source) || /`[^`]+`/.test(source));
 }
+
+

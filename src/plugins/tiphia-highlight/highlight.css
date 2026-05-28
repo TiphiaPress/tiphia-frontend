@@ -359,3 +359,67 @@
     line-height: 1.72 !important;
   }
 }
+
+/* Keep the floating Copy button inside the code body without covering the first line. */
+.tiphia-code-block .tiphia-code-copy,
+.content .tiphia-code-block .tiphia-code-copy {
+  top: 10px !important;
+  right: 10px !important;
+  z-index: 8 !important;
+}
+
+.tiphia-code-block .tiphia-code-body > pre,
+.content .tiphia-code-block .tiphia-code-body > pre {
+  padding-right: 88px !important;
+}
+
+.tiphia-code-block.wrap .tiphia-code-body > pre,
+.content .tiphia-code-block.wrap .tiphia-code-body > pre {
+  padding-right: 88px !important;
+}
+
+@media (max-width: 640px) {
+  .tiphia-code-block .tiphia-code-copy,
+  .content .tiphia-code-block .tiphia-code-copy {
+    top: 8px !important;
+    right: 8px !important;
+    min-width: 46px !important;
+    padding: 6px 8px !important;
+  }
+
+  .tiphia-code-block .tiphia-code-body > pre,
+  .content .tiphia-code-block .tiphia-code-body > pre {
+    padding-right: 72px !important;
+  }
+}
+
+/* BlackMac should feel like a soft pure black terminal, not gray-blue. */
+.tiphia-code-block.prism-style-blackmac,
+.content .tiphia-code-block.prism-style-blackmac {
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.2) !important;
+}
+
+.tiphia-code-block.prism-style-blackmac .tiphia-code-header,
+.content .tiphia-code-block.prism-style-blackmac .tiphia-code-header {
+  background: linear-gradient(180deg, #14151a, #101116) !important;
+}
+
+.tiphia-code-block.prism-style-blackmac .tiphia-code-body,
+.tiphia-code-block.prism-style-blackmac .tiphia-code-body > pre,
+.content .tiphia-code-block.prism-style-blackmac .tiphia-code-body,
+.content .tiphia-code-block.prism-style-blackmac .tiphia-code-body > pre {
+  background: #090a0d !important;
+}
+
+.tiphia-code-block.prism-style-blackmac .tiphia-code-lines,
+.content .tiphia-code-block.prism-style-blackmac .tiphia-code-lines {
+  background: #0d0e12 !important;
+  border-color: #24262f !important;
+}
+
+.tiphia-code-block.prism-style-blackmac .tiphia-code-copy,
+.content .tiphia-code-block.prism-style-blackmac .tiphia-code-copy {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #d8dce6 !important;
+}

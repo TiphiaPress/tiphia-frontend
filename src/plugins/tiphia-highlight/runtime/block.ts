@@ -1,16 +1,19 @@
 import { highlightStyleClass, type HighlightConfig } from "../config";
 import { detectLanguage, normalizeLanguage, resolvePrismLanguage } from "../languages";
 import { cleanupPrismPlugins } from "./cleanup";
+import { ensurePrismLanguage } from "./prismLoader";
 import { copyCode } from "./clipboard";
 import { configKey, escapeHtml, mergeCodeClass, readOriginalSource } from "./domText";
 import "./prismTypes";
 
-export function enhanceBlock(pre: HTMLElement, config: HighlightConfig, force = false) {
+export async function enhanceBlock(pre: HTMLElement, config: HighlightConfig, force = false) {
   const code = pre.querySelector("code");
   if (!code) return;
 
   const source = readOriginalSource(code);
-  const language = resolvePrismLanguage(normalizeLanguage(detectLanguage(code, source)), window.Prism?.languages);
+  const detectedLanguage = normalizeLanguage(detectLanguage(code, source));
+  await ensurePrismLanguage(detectedLanguage).catch(() => undefined);
+  const language = resolvePrismLanguage(detectedLanguage, window.Prism?.languages);
   const key = configKey(config, source, language);
   if (!force && pre.dataset.tiphiaHighlighted === key) {
     cleanupPrismPlugins(pre.closest<HTMLElement>(".tiphia-code-block"), pre);
@@ -119,3 +122,5 @@ function renderLineNumbers(body: HTMLElement, source: string, enabled: boolean) 
   const count = Math.max(1, source.replace(/\n$/, "").split(/\r?\n/).length);
   lines.innerHTML = Array.from({ length: count }, (_, index) => `<span>${index + 1}</span>`).join("");
 }
+
+

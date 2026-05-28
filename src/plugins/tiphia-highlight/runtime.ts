@@ -14,10 +14,10 @@ export function enhanceCodeBlocks() {
     getHighlightConfig()
       .then(async (config) => {
         await loadPrism(config);
-        if (!cancelled) applyHighlight(config);
+        if (!cancelled) void applyHighlight(config);
       })
       .catch(() => {
-        if (!cancelled) applyHighlight(defaultHighlightConfig);
+        if (!cancelled) void applyHighlight(defaultHighlightConfig);
       });
   };
 
@@ -33,9 +33,11 @@ export function enhanceCodeBlocks() {
 
 export async function enhancePreviewCodeBlock(pre: HTMLElement, config: HighlightConfig) {
   await loadPrism(config);
-  enhanceBlock(pre, config, true);
+  await enhanceBlock(pre, config, true);
 }
 
-function applyHighlight(config: HighlightConfig) {
-  document.querySelectorAll<HTMLElement>(HIGHLIGHT_SELECTOR).forEach((pre) => enhanceBlock(pre, config));
+async function applyHighlight(config: HighlightConfig) {
+  await Promise.all(Array.from(document.querySelectorAll<HTMLElement>(HIGHLIGHT_SELECTOR), (pre) => enhanceBlock(pre, config)));
 }
+
+
