@@ -42,6 +42,7 @@ export type FrontendHook =
   | "blog.search.before"
   | "blog.search.after"
   | "blog.custom-page.after"
+  | "blog.not-found"
   | `blog.custom-page.${string}`
   | "blog.comment.captcha"
   | "blog.comment.list.before"
@@ -176,4 +177,5 @@ function isPluginEnabled(plugin: FrontendPlugin, enabledPlugins: Set<string> | n
 function enabledPluginsKey(enabledPlugins: Set<string> | null) {
   return enabledPlugins ? Array.from(enabledPlugins).sort().join("\n") : "";
 }
+
 

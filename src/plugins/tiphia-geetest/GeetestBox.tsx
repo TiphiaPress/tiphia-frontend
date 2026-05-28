@@ -117,6 +117,7 @@ function shouldRender(config: GeetestPublicConfig | undefined, mode: GeetestHook
 }
 
 function buildOptions(config: GeetestPublicConfig) {
+  const theme = resolveGeetestTheme(config.theme_mode);
   return {
     product: config.product || "float",
     nativeButton: {
@@ -134,7 +135,18 @@ function buildOptions(config: GeetestPublicConfig) {
     },
     nextWidth: config.next_width || undefined,
     hideSuccess: config.hide_success || undefined,
+    theme,
   };
+}
+
+function resolveGeetestTheme(mode: GeetestPublicConfig["theme_mode"] | undefined | null) {
+  if (mode === "light" || mode === "dark") {
+    return mode;
+  }
+  if (typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
+    return "dark";
+  }
+  return "light";
 }
 
 function formatGeetestError(error: unknown) {
@@ -185,5 +197,6 @@ function loadGeetestScript() {
     document.head.appendChild(script);
   });
 }
+
 
 

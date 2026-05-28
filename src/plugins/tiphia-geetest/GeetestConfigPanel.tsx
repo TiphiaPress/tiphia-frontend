@@ -18,6 +18,7 @@ interface GeetestConfig {
   mask_outside: boolean;
   mask_bg_color: string;
   hide_success: boolean;
+  theme_mode: "system" | "light" | "dark";
 }
 
 const defaultConfig: GeetestConfig = {
@@ -37,6 +38,7 @@ const defaultConfig: GeetestConfig = {
   mask_outside: true,
   mask_bg_color: "#0000004d",
   hide_success: false,
+  theme_mode: "system",
 };
 
 export function GeetestConfigPanel({ value, saving, error, onSubmit }: PluginConfigPanelProps) {
@@ -69,6 +71,7 @@ export function GeetestConfigPanel({ value, saving, error, onSubmit }: PluginCon
           mask_outside: form.mask_outside,
           mask_bg_color: form.mask_bg_color.trim(),
           hide_success: form.hide_success,
+          theme_mode: form.theme_mode,
         });
       }}
     >
@@ -151,6 +154,14 @@ export function GeetestConfigPanel({ value, saving, error, onSubmit }: PluginCon
           </select>
         </label>
         <label className="field">
+          <span>验证码主题</span>
+          <select value={form.theme_mode} onChange={(event) => setForm({ ...form, theme_mode: event.target.value as GeetestConfig["theme_mode"] })}>
+            <option value="system">跟随浏览器</option>
+            <option value="light">浅色模式</option>
+            <option value="dark">暗黑模式</option>
+          </select>
+        </label>
+        <label className="field">
           <span>按钮宽度</span>
           <input value={form.native_button_width} placeholder="100%" onChange={(event) => setForm({ ...form, native_button_width: event.target.value })} />
         </label>
@@ -222,6 +233,7 @@ function readConfig(value: Record<string, unknown>): GeetestConfig {
     mask_outside: booleanValue(value.mask_outside, defaultConfig.mask_outside),
     mask_bg_color: stringValue(value.mask_bg_color) || defaultConfig.mask_bg_color,
     hide_success: booleanValue(value.hide_success, defaultConfig.hide_success),
+    theme_mode: themeModeValue(value.theme_mode),
   };
 }
 
@@ -235,6 +247,10 @@ function booleanValue(value: unknown, fallback: boolean) {
 
 function productValue(value: unknown): GeetestConfig["product"] {
   return value === "popup" || value === "bind" || value === "float" ? value : defaultConfig.product;
+}
+
+function themeModeValue(value: unknown): GeetestConfig["theme_mode"] {
+  return value === "dark" || value === "light" || value === "system" ? value : defaultConfig.theme_mode;
 }
 
 function protocolValue(value: unknown): GeetestConfig["protocol"] {
@@ -253,3 +269,4 @@ function numberOrNull(value: string) {
   const parsed = Number(trimmed);
   return Number.isFinite(parsed) ? parsed : null;
 }
+

@@ -12,6 +12,17 @@ import type {
   TokenResponse,
 } from "../types";
 
+export class ApiRequestError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly code?: string,
+  ) {
+    super(message);
+    this.name = "ApiRequestError";
+  }
+}
+
 export const apiBase = resolveApiBase();
 
 async function request<T>(path: string): Promise<T> {
@@ -31,7 +42,7 @@ async function requestWithInit<T>(path: string, init: RequestInit = {}): Promise
   const body = text ? JSON.parse(text) : null;
   if (!response.ok) {
     const message = body?.error?.message || response.statusText;
-    throw new Error(message);
+    throw new ApiRequestError(message, response.status, body?.error?.code);
   }
   return body as T;
 }

@@ -69,6 +69,7 @@ export interface BlogThemeViews {
     gravatarBaseUrl?: string | null;
   }>;
   ExternalWarning: ComponentType<{ target: string }>;
+  NotFound: ComponentType<{ path: string }>;
   CommentForm: ComponentType<{
     title: string;
     form: CommentFormState;
@@ -102,6 +103,7 @@ export interface BlogTheme {
   Layout: BlogThemeLayout;
   views: BlogThemeViews;
 }
+
 
 
 

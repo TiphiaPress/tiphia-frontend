@@ -21,6 +21,7 @@ import { RegisterPage } from "../blog/pages/RegisterPage";
 import { TermArchive, TermDirectory } from "../blog/pages/Terms";
 import { Timeline } from "../blog/pages/Timeline";
 import { ExternalWarningPage } from "../blog/pages/ExternalWarningPage";
+import { NotFoundPage, NotFoundRedirect } from "../blog/pages/NotFound";
 import { frontendPluginRoutes } from "../framework/plugin-hooks";
 
 const queryClient = new QueryClient({
@@ -71,12 +72,13 @@ export function UnifiedApp() {
               <Route path="pages/:slug" element={<PageDetail />} />
               <Route path="custom-pages/:slug" element={<CustomPageDetail />} />
               <Route path="terms/:id" element={<TermArchive />} />
+              <Route path="404" element={<NotFoundPage />} />
             </Route>
             {pluginRoutes.map((route) => (
               <Route key={`${route.plugin}:${route.path}`} path={route.path} element={route.element} />
             ))}
             <Route path="/login" element={<Navigate to="/admin/login" replace />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFoundRedirect />} />
             </Routes>
           </BrowserRouter>
         </ToastProvider>
@@ -84,4 +86,5 @@ export function UnifiedApp() {
     </QueryClientProvider>
   );
 }
+
 

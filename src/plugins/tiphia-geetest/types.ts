@@ -1,4 +1,5 @@
 export type GeetestProduct = "float" | "popup" | "bind";
+export type GeetestThemeMode = "system" | "light" | "dark";
 
 export interface GeetestPublicConfig {
   enabled: boolean;
@@ -18,9 +19,11 @@ export interface GeetestPublicConfig {
   mask_bg_color?: string | null;
   next_width?: string | null;
   hide_success?: boolean | null;
+  theme_mode?: GeetestThemeMode | null;
 }
 
 export interface GeetestHookContext {
   mode: "login" | "register" | "comment";
   onVerify?: (value: Record<string, unknown> | null) => void;
 }
+
