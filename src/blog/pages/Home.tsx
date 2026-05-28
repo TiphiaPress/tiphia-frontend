@@ -8,13 +8,15 @@ export function Home() {
   const { State, Home: HomeView } = useActiveThemeViews();
   const settings = useQuery({ queryKey: ["settings"], queryFn: api.settings });
   const [page, setPage] = useState(1);
-  const [q, setQ] = useState("");
+  const [draftQ, setDraftQ] = useState("");
+  const [searchQ, setSearchQ] = useState("");
   const themeConfig = settings.data?.theme.config || {};
   const pinnedIds = themeNumberArray(themeConfig, "pinned_post_ids");
   const pinnedSlugs = themeStringArray(themeConfig, "pinned_post_slugs");
   const posts = useQuery({
-    queryKey: ["posts", page, effectivePageSize(settings.data), q],
-    queryFn: () => api.posts(page, effectivePageSize(settings.data), q),
+    queryKey: ["posts", page, effectivePageSize(settings.data), searchQ],
+    queryFn: () => api.posts(page, effectivePageSize(settings.data), searchQ),
+    placeholderData: (previousData) => previousData,
   });
   const pinnedPosts = useQuery({
     queryKey: ["pinned-posts", pinnedIds.join(","), pinnedSlugs.join(",")],
@@ -47,17 +49,14 @@ export function Home() {
   return (
     <HomeView
       settings={settings.data}
-      q={q}
-      onQueryChange={(value) => {
-        setQ(value);
-        setPage(1);
-      }}
+      q={draftQ}
+      onQueryChange={setDraftQ}
       onSearch={() => {
         setPage(1);
-        void posts.refetch();
+        setSearchQ(draftQ.trim());
       }}
       posts={posts.data}
-      pinnedPosts={page === 1 && !q.trim() ? pinnedPosts.data || [] : []}
+      pinnedPosts={page === 1 && !searchQ ? pinnedPosts.data || [] : []}
       page={page}
       onPageChange={setPage}
       showPopularPosts={showPopularPosts}

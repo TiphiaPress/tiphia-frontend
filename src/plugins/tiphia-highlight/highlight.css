@@ -311,3 +311,51 @@
 
 
 
+
+/* iOS Safari code font normalization: keep Prism tokens, line numbers and code text the same size. */
+.tiphia-code-block,
+.tiphia-code-block *,
+.content .tiphia-code-block,
+.content .tiphia-code-block * {
+  -webkit-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+}
+
+.tiphia-code-block pre,
+.tiphia-code-block code,
+.tiphia-code-block .token,
+.tiphia-code-block .tiphia-code-lines,
+.tiphia-code-block .tiphia-code-lines span,
+.content .tiphia-code-block pre,
+.content .tiphia-code-block code,
+.content .tiphia-code-block .token,
+.content .tiphia-code-block .tiphia-code-lines,
+.content .tiphia-code-block .tiphia-code-lines span {
+  font-family: "JetBrains Mono", "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace !important;
+  font-size: 13.5px !important;
+  font-style: normal !important;
+  font-variant-ligatures: none !important;
+  font-weight: 400 !important;
+  line-height: 1.72 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.tiphia-code-block .tiphia-code-language,
+.tiphia-code-block .tiphia-code-copy,
+.content .tiphia-code-block .tiphia-code-language,
+.content .tiphia-code-block .tiphia-code-copy {
+  font-family: inherit !important;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .tiphia-code-block pre,
+  .tiphia-code-block code,
+  .tiphia-code-block .token,
+  .content .tiphia-code-block pre,
+  .content .tiphia-code-block code,
+  .content .tiphia-code-block .token {
+    font-size: 13px !important;
+    line-height: 1.72 !important;
+  }
+}
